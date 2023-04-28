@@ -41,7 +41,9 @@ export class SolverService {
     );
 
     const timeWeights = this.calculateTimeWeights(distanceWeights, speed);
-    return [];
+
+    // dummy responce for now
+    return [startBase, ...pointsToObserve, startBase];
   }
 
   // the convention would be that in the weight matrics first rows are point to observe, then bases (first base, then rest of bases)
