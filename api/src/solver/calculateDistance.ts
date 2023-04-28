@@ -1,4 +1,4 @@
-import { Point } from './models';
+import { Degrees, Point } from './models';
 
 // calculates the distance between two points in kilometers
 export function calculateDistance(point1: Point, point2: Point) {
@@ -17,6 +17,6 @@ export function calculateDistance(point1: Point, point2: Point) {
   return d;
 }
 
-function degreeToRadians(degree: number) {
+function degreeToRadians(degree: Degrees) {
   return degree * (Math.PI / 180);
 }

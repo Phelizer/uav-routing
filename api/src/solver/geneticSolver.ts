@@ -1,11 +1,11 @@
-import { Point, TimeWeights } from './models';
+import { Milliseconds, Point, TimeWeights } from './models';
 
 export function geneticSolver(
   pointsToObserve: Point[],
   startBase: Point,
   restOfBases: Point[],
   timeWeights: TimeWeights,
-  chargeTime: number,
+  chargeTime: Milliseconds,
 ): Point[] {
   // dummy for now
   return [startBase, ...pointsToObserve, restOfBases[0] ?? startBase];

@@ -1,10 +1,10 @@
 // lat and lng values here are in degrees
 export interface Point {
-  lat: number;
-  lng: number;
+  lat: Degrees;
+  lng: Degrees;
 }
 
-export type TimeWeights = number[][];
+export type TimeWeights = Milliseconds[][];
 
 export interface Solver {
   (
@@ -12,6 +12,11 @@ export interface Solver {
     startBase: Point,
     restOfBases: Point[],
     timeWeights: TimeWeights,
-    chargeTime: number,
+    chargeTime: Milliseconds,
   ): Point[];
 }
+
+export type Milliseconds = number;
+export type Kilometers = number;
+export type Degrees = number;
+export type KilometersPeHour = number;
