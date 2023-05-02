@@ -1,7 +1,9 @@
 import { Body, Controller, Get, UseGuards } from '@nestjs/common';
 import { KilometersPeHour, Milliseconds, Point } from './models';
 import { SolverService } from './solver.service';
-import { AuthGuard } from '../auth/auth.guard';
+import { Roles } from 'src/users/roles.decorator';
+import { Role } from 'src/users/role.enum';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 
 interface RequestBody {
   pointsToObserve: Point[];
@@ -16,7 +18,8 @@ interface RequestBody {
 export class SolverController {
   constructor(readonly solverService: SolverService) {}
 
-  @UseGuards(AuthGuard)
+  @Roles(Role.User)
+  @UseGuards(JwtAuthGuard)
   @Get('solve')
   calculateRoute(@Body() body: RequestBody): Point[] {
     return this.solverService.calculateRoute(body);
