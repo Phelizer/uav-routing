@@ -2,6 +2,7 @@
 export interface Point {
   lat: Degrees;
   lng: Degrees;
+  // type: 'point' | 'base';
 }
 
 export type TimeWeights = Milliseconds[][];
@@ -10,9 +11,10 @@ export interface Solver {
   (
     pointsToObserve: Point[],
     startBase: Point,
-    restOfBases: Point[],
-    timeWeights: TimeWeights,
+    anotherBase: Point,
     chargeTime: Milliseconds,
+    maxFlightTime: Milliseconds,
+    speed: KilometersPeHour,
   ): Point[];
 }
 

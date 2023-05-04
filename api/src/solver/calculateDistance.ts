@@ -1,7 +1,18 @@
-import { Degrees, Point } from './models';
+import { Degrees, Kilometers, KilometersPeHour, Point } from './models';
+
+export function calculateTimeBetweenTwoPoints(
+  point1: Point,
+  point2: Point,
+  speed: KilometersPeHour,
+) {
+  const millisenondsInHour = 3600000;
+  const distance = calculateDistance(point1, point2);
+  const flightTime = (distance / speed) * millisenondsInHour;
+  return flightTime;
+}
 
 // calculates the distance between two points in kilometers
-export function calculateDistance(point1: Point, point2: Point) {
+export function calculateDistance(point1: Point, point2: Point): Kilometers {
   const earthRadiusInKM = 6371;
   const deltaLat = degreeToRadians(point2.lat - point1.lat);
   const deltaLng = degreeToRadians(point2.lng - point1.lng);
