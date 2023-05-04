@@ -20,6 +20,11 @@ export const initValidSolution: Solver = (
   );
 };
 
+function routeEndsInBase(bases: Point[], route: Point[]) {
+  const lastPoint = route[route.length - 1];
+  return bases.some((base) => lastPoint === base);
+}
+
 function buildValidRoute(
   pointsToObserve: Point[],
   startBase: Point,
@@ -33,7 +38,7 @@ function buildValidRoute(
   let currentPoint = startBase;
   let unvisitedPoints = pointsToObserve;
   let restOfFlightTime = maxFlightTime;
-  while (unvisitedPoints.length !== 0) {
+  do {
     const { pointToPick, newRestOfFlightTime, newUnvisitedPoints } =
       findAvailablePoint(
         currentPoint,
@@ -48,9 +53,31 @@ function buildValidRoute(
     currentPoint = pointToPick;
     restOfFlightTime = newRestOfFlightTime;
     unvisitedPoints = newUnvisitedPoints;
-  }
+  } while (unvisitedPoints.length !== 0 || !routeEndsInBase(bases, route));
 
   return route;
+}
+
+function findNearestBase(
+  availableBases: Point[],
+  currentPoint: Point,
+  speed: Milliseconds,
+) {
+  return availableBases.reduce((nearestBase, currentBase) => {
+    const minValue = calculateTimeBetweenTwoPoints(
+      currentPoint,
+      nearestBase,
+      speed,
+    );
+
+    const currentValue = calculateTimeBetweenTwoPoints(
+      currentPoint,
+      currentBase,
+      speed,
+    );
+
+    return currentValue < minValue ? currentBase : nearestBase;
+  });
 }
 
 export function findAvailablePoint(
@@ -64,6 +91,20 @@ export function findAvailablePoint(
   const availablePoints = unvisitedPoints.filter((point) =>
     isAvailablePoint(currentPoint, point, bases, restOfFlightTime, speed),
   );
+
+  if (unvisitedPoints.length === 0) {
+    const availableBases = bases.filter((base) =>
+      isAvailableBase(currentPoint, base, restOfFlightTime, speed),
+    );
+
+    const finishBase = findNearestBase(availableBases, currentPoint, speed);
+
+    return {
+      pointToPick: finishBase,
+      newRestOfFlightTime: maxFlightTime,
+      newUnvisitedPoints: unvisitedPoints,
+    };
+  }
 
   if (availablePoints.length === 0) {
     const availableBases = bases.filter((base) =>
