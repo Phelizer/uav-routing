@@ -8,9 +8,14 @@ import {
   TimeWeights,
 } from './models';
 import { calculateDistance } from './calculateDistance';
-import { generateRandomPoint } from './generateRandomPoint';
 import * as fs from 'fs-extra';
-import { tabuSolver } from './tabuSolver';
+import {
+  createCalculateTimeFitness,
+  generateNeighbors,
+  isValidRoute,
+  tabuSolver,
+} from './tabuSolver';
+import { initValidSolution } from './initValidSolution';
 
 interface CalculateRouteParams {
   pointsToObserve: Point[];
@@ -73,6 +78,15 @@ export class SolverService {
       speed2,
     );
 
+    const initialSolution = initValidSolution(
+      shuffledPoints,
+      startBase2,
+      anotherBase2,
+      chargeTime2,
+      maxFlightTime2,
+      speed2,
+    );
+
     const dist = this.calculateRouteDistance(route);
 
     return {
@@ -81,74 +95,6 @@ export class SolverService {
       distance: dist,
     };
   }
-
-  private adapter = (point: Point) => {
-    return { x: point.lat, y: point.lng };
-  };
-
-  private reverseAdapter = (point: { x: number; y: number }) => {
-    return {
-      lat: point.x,
-      lng: point.y,
-    };
-  };
-
-  // not working properly
-  private validateFirstInterval(
-    route: Point[],
-    speed: KilometersPeHour,
-    maxFlightTime: Milliseconds,
-    intervalStartBase: Point,
-    intervalEndBase: Point,
-  ): boolean {
-    let distance = 0;
-
-    const startIndex = route.findIndex((elem) => elem === intervalStartBase);
-    // const endIndex = route.findIndex((elem) => elem === intervalEndBase);
-    const endIndex = this.getIndexOfNthOccurance(
-      route,
-      (elem: any) => elem.type === 'base',
-      2,
-    );
-
-    console.log({ startIndex, endIndex });
-    for (let i = startIndex; i < endIndex; i++) {
-      const elem = route[i];
-      const nextElem = route[i + 1];
-      const distanceBetweenTwoPoints = calculateDistance(elem, nextElem);
-      console.log({ distanceBetweenTwoPoints });
-      distance += distanceBetweenTwoPoints;
-    }
-
-    const millisenondsInHour = 3600000;
-    const maxDistance = speed * (maxFlightTime / millisenondsInHour);
-    console.log({ distance, maxDistance });
-    return distance <= maxDistance;
-  }
-
-  // todo: rewrite
-  private getIndexOfNthOccurance = <T>(
-    arr: T[],
-    predicate: (elem: T) => boolean,
-    n: number,
-  ) => {
-    const position = arr.reduce(
-      (acc, val, ind) => {
-        if (predicate(val)) {
-          if (acc.count + 1 === n) {
-            acc['index'] = ind;
-          }
-          acc['count']++;
-        }
-        return acc;
-      },
-      {
-        index: -1,
-        count: 0,
-      },
-    );
-    return position.index;
-  };
 
   private calculateRouteDistance(route: Point[]): Kilometers {
     let distance = 0;
