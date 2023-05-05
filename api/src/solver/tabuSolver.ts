@@ -19,6 +19,10 @@ class TabuList<T> {
   };
 }
 
+// TODO: there is a correlation "the better initial solution - the better the optimized solution"
+// therefore it might be a good idea to remove randomness from the initial solution algorithm
+// and make it basically a greedy algorithm
+
 export const tabuSolver: Solver = (
   pointsToObserve: Point[],
   startBase: Point,
@@ -37,12 +41,7 @@ export const tabuSolver: Solver = (
     chargeTime,
   );
 
-  // const calculateFitness = createCalculateStopsFitness(
-  //   speed,
-  //   maxFlightTime,
-  //   chargeTime,
-  //   bases,
-  // );
+  // const calculateFitness = createCalculateStopsFitness(bases);
 
   const { route: initialRoute, fitness: initialFitness } = buildValidRoute(
     pointsToObserve,
