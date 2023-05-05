@@ -1,7 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { KilometersPeHour, Milliseconds, Point, Solver } from './models';
 import * as fs from 'fs-extra';
-import { tabuSolver } from './tabuSolver';
+import {
+  createCalculateStopsFitness,
+  createCalculateTimeFitness,
+  tabuSolver,
+} from './tabuSolver';
 
 interface CalculateRouteParams {
   pointsToObserve: Point[];
@@ -49,9 +53,19 @@ export class SolverService {
     );
     console.timeEnd('tabu');
 
+    const calcualteFitnessByStops = createCalculateStopsFitness(bases);
+
+    const calculateFitnessByTime = createCalculateTimeFitness(
+      speed2,
+      maxFlightTime2,
+      chargeTime2,
+    );
+
     return {
       route,
       fitness,
+      stops: calcualteFitnessByStops(route),
+      totalTime: calculateFitnessByTime(route),
     };
   }
 

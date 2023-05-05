@@ -2,7 +2,7 @@
 export interface Point {
   lat: Degrees;
   lng: Degrees;
-  // type: 'point' | 'base';
+  isBase: boolean;
 }
 
 export type TimeWeights = Milliseconds[][];

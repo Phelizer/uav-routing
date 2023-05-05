@@ -1,10 +1,10 @@
 import { Body, Controller, Get, UseGuards } from '@nestjs/common';
-import { Kilometers, KilometersPeHour, Milliseconds, Point } from './models';
+import { KilometersPeHour, Milliseconds, Point } from './models';
 import { SolverService } from './solver.service';
 import { Roles } from 'src/users/roles.decorator';
 import { Role } from 'src/users/role.enum';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
-import { generateRandomPoint } from './generateRandomPoint';
+// import { generateRandomPoint } from './generateRandomPoint';
 
 interface RequestBody {
   pointsToObserve: Point[];

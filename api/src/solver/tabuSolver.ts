@@ -37,6 +37,13 @@ export const tabuSolver: Solver = (
     chargeTime,
   );
 
+  // const calculateFitness = createCalculateStopsFitness(
+  //   speed,
+  //   maxFlightTime,
+  //   chargeTime,
+  //   bases,
+  // );
+
   const { route: initialRoute, fitness: initialFitness } = buildValidRoute(
     pointsToObserve,
     startBase,
@@ -100,7 +107,31 @@ function generateNeighbors(
     );
   }
 
-  return [...swapNeighbors, ...baseChangeNeighbors];
+  const ejectBaseNeighbors = generateEjectBaseNeighbors(isValid, source, bases);
+
+  return [...swapNeighbors, ...baseChangeNeighbors, ...ejectBaseNeighbors];
+}
+
+function generateEjectBaseNeighbors(
+  isValid: (route: Point[]) => boolean,
+  source: Point[],
+  bases: Point[],
+) {
+  const neighbors: Point[][] = [];
+  for (const point of source) {
+    if (isBase(bases, point)) {
+      const routeWithEjectedBase = ejectBase(source, point);
+      if (isValid(routeWithEjectedBase)) {
+        neighbors.push(routeWithEjectedBase);
+      }
+    }
+  }
+
+  return neighbors;
+}
+
+function ejectBase(route: Point[], baseToEject: Point) {
+  return route.filter((point) => point !== baseToEject);
 }
 
 function generateSwapNeighbors(
@@ -216,6 +247,17 @@ export const createCalculateTimeFitness =
     return totalTime;
   };
 
+export const createCalculateStopsFitness =
+  (bases: Point[]) => (route: Point[]) => {
+    return route
+      .slice(1, -1)
+      .reduce(
+        (baseCounter, currPoint) =>
+          isBase(bases, currPoint) ? baseCounter + 1 : baseCounter,
+        0,
+      );
+  };
+
 // utility:
 
 const createTimeFunc =
@@ -248,7 +290,7 @@ export function isValidRoute(
   let currentFlightTime = 0;
   for (let i = 1; i < route.length; i++) {
     currentFlightTime += time(route[i - 1], route[i]);
-    if ((route[i] as any).base) {
+    if (route[i].isBase) {
       if (currentFlightTime > maxFlightTime) {
         return false;
       }
