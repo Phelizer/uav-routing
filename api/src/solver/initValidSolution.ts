@@ -1,8 +1,14 @@
 import { randomInt } from 'src/utils';
 import { calculateTimeBetweenTwoPoints } from './calculateDistance';
 import { KilometersPeHour, Milliseconds, Point, Solver } from './models';
+import { createCalculateTimeFitness } from './tabuSolver';
 
-export const initValidSolution: Solver = (
+function routeEndsInBase(bases: Point[], route: Point[]) {
+  const lastPoint = route[route.length - 1];
+  return bases.some((base) => lastPoint === base);
+}
+
+export const buildValidRoute: Solver = (
   pointsToObserve: Point[],
   startBase: Point,
   anotherBase: Point,
@@ -10,29 +16,6 @@ export const initValidSolution: Solver = (
   maxFlightTime: Milliseconds,
   speed: KilometersPeHour,
 ) => {
-  return buildValidRoute(
-    pointsToObserve,
-    startBase,
-    anotherBase,
-    chargeTime,
-    maxFlightTime,
-    speed,
-  );
-};
-
-function routeEndsInBase(bases: Point[], route: Point[]) {
-  const lastPoint = route[route.length - 1];
-  return bases.some((base) => lastPoint === base);
-}
-
-function buildValidRoute(
-  pointsToObserve: Point[],
-  startBase: Point,
-  anotherBase: Point,
-  chargeTime: Milliseconds,
-  maxFlightTime: Milliseconds,
-  speed: KilometersPeHour,
-) {
   const route: Point[] = [startBase];
   const bases = [startBase, anotherBase];
   let currentPoint = startBase;
@@ -55,8 +38,14 @@ function buildValidRoute(
     unvisitedPoints = newUnvisitedPoints;
   } while (unvisitedPoints.length !== 0 || !routeEndsInBase(bases, route));
 
-  return route;
-}
+  const fitness = createCalculateTimeFitness(
+    speed,
+    maxFlightTime,
+    chargeTime,
+  )(route);
+
+  return { route, fitness };
+};
 
 function findNearestBase(
   availableBases: Point[],

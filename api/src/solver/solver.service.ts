@@ -1,21 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import {
-  Kilometers,
-  KilometersPeHour,
-  Milliseconds,
-  Point,
-  Solver,
-  TimeWeights,
-} from './models';
-import { calculateDistance } from './calculateDistance';
+import { KilometersPeHour, Milliseconds, Point, Solver } from './models';
 import * as fs from 'fs-extra';
-import {
-  createCalculateTimeFitness,
-  generateNeighbors,
-  isValidRoute,
-  tabuSolver,
-} from './tabuSolver';
-import { initValidSolution } from './initValidSolution';
+import { tabuSolver } from './tabuSolver';
 
 interface CalculateRouteParams {
   pointsToObserve: Point[];
@@ -41,23 +27,6 @@ export class SolverService {
     maxFlightTime,
     speed,
   }: CalculateRouteParams): any {
-    // normal:
-    // const distanceWeights = this.calculateDistanceWeights(
-    //   pointsToObserve,
-    //   startBase,
-    //   restOfBases,
-    // );
-    // const timeWeights = this.calculateTimeWeights(distanceWeights, speed);
-    // const route = this.solver(
-    //   pointsToObserve,
-    //   startBase,
-    //   restOfBases,
-    //   timeWeights,
-    //   chargeTime,
-    //   maxFlightTime,
-    // );
-
-    // test2:
     const { points, bases }: { points: Point[]; bases: [Point, Point] } =
       JSON.parse(fs.readFileSync(__dirname + '/../../coords.json').toString());
 
@@ -69,7 +38,8 @@ export class SolverService {
 
     const chargeTime2 = 60000;
 
-    const route = this.solver(
+    console.time('tabu');
+    const { route, fitness } = this.solver(
       shuffledPoints,
       startBase2,
       anotherBase2,
@@ -77,82 +47,12 @@ export class SolverService {
       maxFlightTime2,
       speed2,
     );
-
-    const initialSolution = initValidSolution(
-      shuffledPoints,
-      startBase2,
-      anotherBase2,
-      chargeTime2,
-      maxFlightTime2,
-      speed2,
-    );
-
-    const dist = this.calculateRouteDistance(route);
+    console.timeEnd('tabu');
 
     return {
-      maxFlightTime2,
       route,
-      distance: dist,
+      fitness,
     };
-  }
-
-  private calculateRouteDistance(route: Point[]): Kilometers {
-    let distance = 0;
-    let prevPoint = route[0];
-    for (const currPoint of route.slice(1)) {
-      try {
-        distance += calculateDistance(prevPoint, currPoint);
-        prevPoint = currPoint;
-      } catch (error) {
-        console.log({ error });
-        console.log({ prevPoint });
-        console.log({ currPoint });
-        throw error;
-      }
-    }
-
-    return distance;
-  }
-
-  // the convention would be that in the weight matrics first rows are point to observe, then bases (first base, then rest of bases)
-  // same for columns
-  private calculateTimeWeights(
-    distanceWeights: DistanceWeights,
-    speed: KilometersPeHour,
-  ): TimeWeights {
-    const appliedCalculateTime = this.calculateTime(speed);
-    const timeWeights: TimeWeights = distanceWeights.map((distRow) =>
-      distRow.map(appliedCalculateTime),
-    );
-
-    return timeWeights;
-  }
-
-  private calculateTime =
-    (speed: KilometersPeHour) =>
-    (distance: Kilometers): Milliseconds => {
-      const millisenondsInHour = 3600000;
-      return (distance / speed) * millisenondsInHour;
-    };
-
-  // the convention would be that in the weight matrics first rows are point to observe, then bases (first base, then rest of bases)
-  // same for columns
-  private calculateDistanceWeights(
-    pointsToObserve: Point[],
-    startBase: Point,
-    restOfBases: Point[],
-  ): DistanceWeights {
-    const timeWeights: TimeWeights = [];
-    const allPoints = [...pointsToObserve, startBase, ...restOfBases];
-    for (const point of allPoints) {
-      timeWeights.push(this.calculateRowOfDistanceWeights(point, allPoints));
-    }
-
-    return timeWeights;
-  }
-
-  private calculateRowOfDistanceWeights(rowPoint: Point, allPoints: Point[]) {
-    return allPoints.map((point) => calculateDistance(rowPoint, point));
   }
 
   private randomlyReplaceArrayElements<T>(array: T[]): T[] {
@@ -167,6 +67,67 @@ export class SolverService {
 
     return newArray;
   }
+
+  // TODO: might need to remove these outdated methods:
+
+  // private calculateRouteDistance(route: Point[]): Kilometers {
+  //   let distance = 0;
+  //   let prevPoint = route[0];
+  //   for (const currPoint of route.slice(1)) {
+  //     try {
+  //       distance += calculateDistance(prevPoint, currPoint);
+  //       prevPoint = currPoint;
+  //     } catch (error) {
+  //       console.log({ error });
+  //       console.log({ prevPoint });
+  //       console.log({ currPoint });
+  //       throw error;
+  //     }
+  //   }
+
+  //   return distance;
+  // }
+
+  // the convention would be that in the weight matrics first rows are point to observe, then bases (first base, then rest of bases)
+  // same for columns
+  // private calculateTimeWeights(
+  //   distanceWeights: DistanceWeights,
+  //   speed: KilometersPeHour,
+  // ): TimeWeights {
+  //   const appliedCalculateTime = this.calculateTime(speed);
+  //   const timeWeights: TimeWeights = distanceWeights.map((distRow) =>
+  //     distRow.map(appliedCalculateTime),
+  //   );
+
+  //   return timeWeights;
+  // }
+
+  // private calculateTime =
+  //   (speed: KilometersPeHour) =>
+  //   (distance: Kilometers): Milliseconds => {
+  //     const millisenondsInHour = 3600000;
+  //     return (distance / speed) * millisenondsInHour;
+  //   };
+
+  // the convention would be that in the weight matrics first rows are point to observe, then bases (first base, then rest of bases)
+  // same for columns
+  // private calculateDistanceWeights(
+  //   pointsToObserve: Point[],
+  //   startBase: Point,
+  //   restOfBases: Point[],
+  // ): DistanceWeights {
+  //   const timeWeights: TimeWeights = [];
+  //   const allPoints = [...pointsToObserve, startBase, ...restOfBases];
+  //   for (const point of allPoints) {
+  //     timeWeights.push(this.calculateRowOfDistanceWeights(point, allPoints));
+  //   }
+
+  //   return timeWeights;
+  // }
+
+  // private calculateRowOfDistanceWeights(rowPoint: Point, allPoints: Point[]) {
+  //   return allPoints.map((point) => calculateDistance(rowPoint, point));
+  // }
 }
 
-type DistanceWeights = Kilometers[][];
+// type DistanceWeights = Kilometers[][];

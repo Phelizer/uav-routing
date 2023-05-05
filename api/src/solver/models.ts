@@ -15,7 +15,7 @@ export interface Solver {
     chargeTime: Milliseconds,
     maxFlightTime: Milliseconds,
     speed: KilometersPeHour,
-  ): Point[];
+  ): { route: Point[]; fitness: number };
 }
 
 export type Milliseconds = number;
