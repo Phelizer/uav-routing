@@ -7,6 +7,7 @@ import {
   createCalculateTimeFitness,
   createTabuSolver,
 } from './tabuSolver';
+import { AntColonyParams, createAntColonySolver } from './antColonySolver';
 
 interface CalculateRouteParams {
   pointsToObserve: Point[];
@@ -29,7 +30,19 @@ export class SolverService {
     return createTabuSolver(tabuParams);
   }
 
-  private solver: Solver = this.getTabuSolver();
+  private getAntColonySolver() {
+    const antColonyParams: AntColonyParams = {
+      antsNumber: 200,
+      evaporationRate: 0.2,
+      heurInfoImportance: 0.5,
+      pheromoneImportance: 0.5,
+      maxIterationsWithoutImprovement: 30,
+    };
+
+    return createAntColonySolver(antColonyParams);
+  }
+
+  private solver: Solver = this.getAntColonySolver();
   setSolver = (solver: Solver) => {
     this.solver = solver;
   };

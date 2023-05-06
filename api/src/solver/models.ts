@@ -22,3 +22,8 @@ export type Milliseconds = number;
 export type Kilometers = number;
 export type Degrees = number;
 export type KilometersPeHour = number;
+
+export interface Solution {
+  route: Point[];
+  fitness: number;
+}

@@ -130,7 +130,7 @@ export function findAvailablePoint(
   return { pointToPick, newRestOfFlightTime, newUnvisitedPoints };
 }
 
-function isAvailablePoint(
+export function isAvailablePoint(
   currentPoint: Point,
   anotherPoint: Point,
   bases: Point[],
@@ -153,7 +153,7 @@ function isAvailablePoint(
   );
 }
 
-function isAvailableBase(
+export function isAvailableBase(
   currentPoint: Point,
   base: Point,
   restOfFlightTime: Milliseconds,
@@ -177,7 +177,7 @@ function calculateProbabilities(numbers: number[]): number[] {
 }
 
 // TODO: rewrite
-function determineOutcome(probabilities: number[]): number {
+export function determineOutcome(probabilities: number[]): number {
   const random = Math.random();
   let cumulativeProbability = 0;
 
@@ -188,6 +188,6 @@ function determineOutcome(probabilities: number[]): number {
     }
   }
 
-  // If the loop ends without returning, there must be an error in the probabilities
-  throw new Error('Invalid probabilities. The sum of probabilities must be 1.');
+  const sum = probabilities.reduce((x, y) => x + y, 0);
+  throw new Error(`The sum of chances should be 1. The sum is: ${sum}`);
 }

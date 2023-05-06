@@ -1,6 +1,12 @@
 import { calculateTimeBetweenTwoPoints } from './calculateDistance';
 import { buildValidRoute } from './initValidSolution';
-import { KilometersPeHour, Milliseconds, Point, Solver } from './models';
+import {
+  KilometersPeHour,
+  Milliseconds,
+  Point,
+  Solution,
+  Solver,
+} from './models';
 
 class TabuList<T> {
   constructor(private readonly tenure: number) {}
@@ -27,11 +33,6 @@ export interface TabuParams {
 
 interface CreateTabuSolver {
   (params: TabuParams): Solver;
-}
-
-interface Solution {
-  route: Point[];
-  fitness: number;
 }
 
 export const createTabuSolver: CreateTabuSolver =
