@@ -1,0 +1,16 @@
+.coordinateContainer {
+    display: flex;
+    flex-direction: row;
+}
+
+.coordInput {
+    margin-right: 5vw;
+}
+
+.withLeftMargin {
+    margin-left: 1vw;
+}
+
+.withBottomMargin {
+    margin-bottom: 3vh;
+}
