@@ -5,7 +5,7 @@ import { CookieKeys } from "../utils/consts";
 
 class AppStateStore {
   @observable
-  isLoggedIn = false;
+  isLoggedIn = !!Cookies.get(CookieKeys.accessToken);
 
   constructor() {
     makeObservable(this);

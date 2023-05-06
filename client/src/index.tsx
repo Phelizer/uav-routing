@@ -4,7 +4,7 @@ import "./index.css";
 import reportWebVitals from "./reportWebVitals";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import ErrorPage from "./error-page";
-import { LoginScreen } from "./routes/login-screen";
+import { AuthWrapper } from "./AuthWrapper";
 
 // TODO: remove this verification code:
 if (
@@ -17,7 +17,7 @@ if (
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <LoginScreen />,
+    element: <AuthWrapper />,
     errorElement: <ErrorPage />,
   },
 ]);
