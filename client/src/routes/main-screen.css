@@ -1,9 +1,9 @@
-.coordinateContainer {
+.row {
     display: flex;
     flex-direction: row;
 }
 
-.coordInput {
+.withRightMargin {
     margin-right: 5vw;
 }
 

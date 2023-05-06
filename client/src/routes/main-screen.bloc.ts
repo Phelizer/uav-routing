@@ -1,4 +1,7 @@
-import { action, makeObservable, observable } from "mobx";
+import { action, computed, makeObservable, observable } from "mobx";
+import { Point } from "../models";
+import { SolverService } from "../services/solver.service";
+import { solutionsStoreInstance } from "../stores/solutions.store";
 
 interface Coords {
   lat: string;
@@ -9,11 +12,24 @@ interface PointData extends Coords {
   isBase: boolean;
 }
 
+type Minutes = number;
+type KilometersPerHour = number;
+
+type StrMinutes = string;
+type StrKilometersPerHour = string;
+
 interface InputDataForm {
   points: PointData[];
   startBase: PointData;
   anotherBase: PointData;
+  chargeTime: StrMinutes;
+  maxFlightTime: StrMinutes;
+  speed: StrKilometersPerHour;
 }
+
+type StringFieldsOfInputDataForm = {
+  [Key in keyof InputDataForm]: InputDataForm[Key] extends string ? Key : never;
+}[keyof InputDataForm];
 
 export class MainScreenBLoC {
   @observable
@@ -21,7 +37,17 @@ export class MainScreenBLoC {
     points: [this.createEmptyPoint()],
     startBase: this.createEmptyBase(),
     anotherBase: this.createEmptyBase(),
+    chargeTime: "",
+    maxFlightTime: "",
+    speed: "",
   };
+
+  private solverService = new SolverService();
+
+  @computed
+  get solution() {
+    return (solutionsStoreInstance.lastSolution ?? "").toString();
+  }
 
   constructor() {
     makeObservable(this);
@@ -68,4 +94,53 @@ export class MainScreenBLoC {
   setStartBaseLng = this.createBaseSetter("startBase")("lng");
   setAnotherBaseLat = this.createBaseSetter("anotherBase")("lat");
   setAnotherBaseLng = this.createBaseSetter("anotherBase")("lng");
+
+  private createFormFieldSetter = (fieldName: StringFieldsOfInputDataForm) =>
+    action((value: string) => {
+      this.formData[fieldName] = value;
+    });
+
+  setChargeTime = this.createFormFieldSetter("chargeTime");
+  setMaxFlightTime = this.createFormFieldSetter("maxFlightTime");
+  setSpeed = this.createFormFieldSetter("speed");
+
+  submitForm = async () => {
+    const data = this.prepareFormData();
+    await this.solverService.calculateRoute(data);
+  };
+
+  private readonly MIN_TO_MILLISEC = 60000;
+
+  private prepareFormData() {
+    const pointsToObserve = this.formData.points
+      .filter((point) => !this.isEmptyPoint(point))
+      .map(this.parsePointData);
+
+    const startBase = this.parsePointData(this.formData.startBase);
+    const anotherBase = this.parsePointData(this.formData.anotherBase);
+    const chargeTime = parseFloat(this.formData.chargeTime);
+    const speed = parseFloat(this.formData.speed) * this.MIN_TO_MILLISEC;
+    const maxFlightTime =
+      parseFloat(this.formData.maxFlightTime) * this.MIN_TO_MILLISEC;
+
+    return {
+      pointsToObserve,
+      startBase,
+      anotherBase,
+      chargeTime,
+      maxFlightTime,
+      speed,
+    };
+  }
+
+  private isEmptyPoint = (pointData: PointData) =>
+    !pointData.lat && !pointData.lng;
+
+  private parsePointData = (pointData: PointData): Point => {
+    return {
+      lat: parseFloat(pointData.lat),
+      lng: parseFloat(pointData.lng),
+      isBase: pointData.isBase,
+    };
+  };
 }
