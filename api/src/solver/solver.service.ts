@@ -2,9 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { KilometersPeHour, Milliseconds, Point, Solver } from './models';
 import * as fs from 'fs-extra';
 import {
+  TabuParams,
   createCalculateStopsFitness,
   createCalculateTimeFitness,
-  tabuSolver,
+  createTabuSolver,
 } from './tabuSolver';
 
 interface CalculateRouteParams {
@@ -18,7 +19,17 @@ interface CalculateRouteParams {
 
 @Injectable()
 export class SolverService {
-  private solver: Solver = tabuSolver;
+  private getTabuSolver() {
+    const tabuParams: TabuParams = {
+      maxIterationsWithoutImprovement: 30,
+      numOfRuns: 10,
+      tabuTenure: 10,
+    };
+
+    return createTabuSolver(tabuParams);
+  }
+
+  private solver: Solver = this.getTabuSolver();
   setSolver = (solver: Solver) => {
     this.solver = solver;
   };
@@ -81,67 +92,4 @@ export class SolverService {
 
     return newArray;
   }
-
-  // TODO: might need to remove these outdated methods:
-
-  // private calculateRouteDistance(route: Point[]): Kilometers {
-  //   let distance = 0;
-  //   let prevPoint = route[0];
-  //   for (const currPoint of route.slice(1)) {
-  //     try {
-  //       distance += calculateDistance(prevPoint, currPoint);
-  //       prevPoint = currPoint;
-  //     } catch (error) {
-  //       console.log({ error });
-  //       console.log({ prevPoint });
-  //       console.log({ currPoint });
-  //       throw error;
-  //     }
-  //   }
-
-  //   return distance;
-  // }
-
-  // the convention would be that in the weight matrics first rows are point to observe, then bases (first base, then rest of bases)
-  // same for columns
-  // private calculateTimeWeights(
-  //   distanceWeights: DistanceWeights,
-  //   speed: KilometersPeHour,
-  // ): TimeWeights {
-  //   const appliedCalculateTime = this.calculateTime(speed);
-  //   const timeWeights: TimeWeights = distanceWeights.map((distRow) =>
-  //     distRow.map(appliedCalculateTime),
-  //   );
-
-  //   return timeWeights;
-  // }
-
-  // private calculateTime =
-  //   (speed: KilometersPeHour) =>
-  //   (distance: Kilometers): Milliseconds => {
-  //     const millisenondsInHour = 3600000;
-  //     return (distance / speed) * millisenondsInHour;
-  //   };
-
-  // the convention would be that in the weight matrics first rows are point to observe, then bases (first base, then rest of bases)
-  // same for columns
-  // private calculateDistanceWeights(
-  //   pointsToObserve: Point[],
-  //   startBase: Point,
-  //   restOfBases: Point[],
-  // ): DistanceWeights {
-  //   const timeWeights: TimeWeights = [];
-  //   const allPoints = [...pointsToObserve, startBase, ...restOfBases];
-  //   for (const point of allPoints) {
-  //     timeWeights.push(this.calculateRowOfDistanceWeights(point, allPoints));
-  //   }
-
-  //   return timeWeights;
-  // }
-
-  // private calculateRowOfDistanceWeights(rowPoint: Point, allPoints: Point[]) {
-  //   return allPoints.map((point) => calculateDistance(rowPoint, point));
-  // }
 }
-
-// type DistanceWeights = Kilometers[][];

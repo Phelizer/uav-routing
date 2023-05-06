@@ -19,76 +19,107 @@ class TabuList<T> {
   };
 }
 
-// TODO: there is a correlation "the better initial solution - the better the optimized solution"
-// therefore it might be a good idea to remove randomness from the initial solution algorithm
-// and make it basically a greedy algorithm
+export interface TabuParams {
+  maxIterationsWithoutImprovement: number;
+  numOfRuns: number;
+  tabuTenure: number;
+}
 
-export const tabuSolver: Solver = (
-  pointsToObserve: Point[],
-  startBase: Point,
-  anotherBase: Point,
-  chargeTime: Milliseconds,
-  maxFlightTime: Milliseconds,
-  speed: Milliseconds,
-) => {
-  const bases = [startBase, anotherBase];
-  const isValid = (route: Point[]) =>
-    isValidRoute(route, maxFlightTime, speed, pointsToObserve);
+interface CreateTabuSolver {
+  (params: TabuParams): Solver;
+}
 
-  const calculateFitness = createCalculateTimeFitness(
-    speed,
-    maxFlightTime,
-    chargeTime,
-  );
+interface Solution {
+  route: Point[];
+  fitness: number;
+}
 
-  // const calculateFitness = createCalculateStopsFitness(bases);
+export const createTabuSolver: CreateTabuSolver =
+  (params: TabuParams) =>
+  (
+    pointsToObserve: Point[],
+    startBase: Point,
+    anotherBase: Point,
+    chargeTime: Milliseconds,
+    maxFlightTime: Milliseconds,
+    speed: Milliseconds,
+  ) => {
+    const { maxIterationsWithoutImprovement, numOfRuns, tabuTenure } = params;
+    const bases = [startBase, anotherBase];
+    const isValid = (route: Point[]) =>
+      isValidRoute(route, maxFlightTime, speed, pointsToObserve);
 
-  const { route: initialRoute, fitness: initialFitness } = buildValidRoute(
-    pointsToObserve,
-    startBase,
-    anotherBase,
-    chargeTime,
-    maxFlightTime,
-    speed,
-  );
+    const calculateFitness = createCalculateTimeFitness(
+      speed,
+      maxFlightTime,
+      chargeTime,
+    );
 
-  console.log('INITIAL FITNESS:', initialFitness);
+    // const calculateFitness = createCalculateStopsFitness(bases);
 
-  let bestSolution = initialRoute;
+    const besSolutionsByRuns: Solution[] = [];
 
-  let bestFitness = calculateFitness(bestSolution);
+    for (let runNumber = 0; runNumber < numOfRuns; runNumber++) {
+      const { route: initialRoute, fitness: initialFitness } = buildValidRoute(
+        pointsToObserve,
+        startBase,
+        anotherBase,
+        chargeTime,
+        maxFlightTime,
+        speed,
+      );
 
-  const tabuList = new TabuList<string>(10);
-  const maxIterations = 1000;
+      console.log('INITIAL FITNESS:', initialFitness);
 
-  for (let i = 0; i < maxIterations; i++) {
-    let currentSolution = bestSolution;
-    let currentFitness = bestFitness;
-    let isThereFoundNeighborhood = false;
+      let bestSolution = initialRoute;
 
-    const neighbors = generateNeighbors(isValid, currentSolution, bases);
-    for (const neigh of neighbors) {
-      const neighborFitness = calculateFitness(neigh);
-      const str = JSON.stringify(neigh);
-      if (!tabuList.has(str) || neighborFitness < bestFitness) {
-        if (neighborFitness < currentFitness) {
-          currentSolution = neigh;
-          currentFitness = neighborFitness;
-          isThereFoundNeighborhood = true;
+      let bestFitness = calculateFitness(bestSolution);
+
+      const tabuList = new TabuList<string>(tabuTenure);
+      let iterationsWithoutImprovement = 0;
+      while (iterationsWithoutImprovement < maxIterationsWithoutImprovement) {
+        let currentSolution = bestSolution;
+        let currentFitness = bestFitness;
+        let isThereFoundNeighborhood = false;
+
+        const neighbors = generateNeighbors(isValid, currentSolution, bases);
+        for (const neigh of neighbors) {
+          const neighborFitness = calculateFitness(neigh);
+          const str = JSON.stringify(neigh);
+          if (!tabuList.has(str) || neighborFitness < bestFitness) {
+            if (neighborFitness < currentFitness) {
+              currentSolution = neigh;
+              currentFitness = neighborFitness;
+              isThereFoundNeighborhood = true;
+            }
+          }
+        }
+
+        if (isThereFoundNeighborhood) {
+          bestSolution = currentSolution;
+          bestFitness = currentFitness;
+          const str = JSON.stringify(currentSolution);
+          tabuList.append(str);
+          iterationsWithoutImprovement = 0;
+        } else {
+          iterationsWithoutImprovement++;
         }
       }
+
+      const bestSolutionOfThisRun = {
+        route: bestSolution,
+        fitness: bestFitness,
+      };
+
+      besSolutionsByRuns.push(bestSolutionOfThisRun);
     }
 
-    if (isThereFoundNeighborhood) {
-      bestSolution = currentSolution;
-      bestFitness = currentFitness;
-      const str = JSON.stringify(currentSolution);
-      tabuList.append(str);
-    }
-  }
+    const bestSolutionEver = besSolutionsByRuns.reduce((best, curr) =>
+      curr.fitness < best.fitness ? curr : best,
+    );
 
-  return { route: bestSolution, fitness: bestFitness };
-};
+    return bestSolutionEver;
+  };
 
 function generateNeighbors(
   isValid: (route: Point[]) => boolean,
