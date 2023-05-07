@@ -197,10 +197,12 @@ function getValidChanges(
     const nearest = nearestPointsMapping.get(point) ?? [];
     // swaps
     for (const nearPoint of nearest) {
-      const indexOfNearest = route.findIndex((p) => p === nearPoint);
-      const newSol = swap(route, i, indexOfNearest);
-      if (valid(newSol)) {
-        newSols.push(newSol);
+      if (!nearPoint.isBase) {
+        const indexOfNearest = route.findIndex((p) => p === nearPoint);
+        const newSol = swap(route, i, indexOfNearest);
+        if (valid(newSol)) {
+          newSols.push(newSol);
+        }
       }
     }
 
@@ -231,26 +233,29 @@ function getDescendants(
   const newSols: Point[][] = [];
   for (const [point1IndexAtFirstRoute, point1] of route1.entries()) {
     for (const [point2IndexAtSecondRoute, point2] of route2.entries()) {
-      const point1IndexAtSecondRoute = route2.findIndex((p) => p === point1);
-      const point2IndexAtFirstRoute = route1.findIndex((p) => p === point2);
-      const firstDescendant = swap(
-        route1,
-        point1IndexAtFirstRoute,
-        point2IndexAtFirstRoute,
-      );
+      if (!point1.isBase && !point2.isBase) {
+        const point1IndexAtSecondRoute = route2.findIndex((p) => p === point1);
+        const point2IndexAtFirstRoute = route1.findIndex((p) => p === point2);
 
-      const secondDescendant = swap(
-        route2,
-        point1IndexAtSecondRoute,
-        point2IndexAtSecondRoute,
-      );
+        const firstDescendant = swap(
+          route1,
+          point1IndexAtFirstRoute,
+          point2IndexAtFirstRoute,
+        );
 
-      if (valid(firstDescendant)) {
-        newSols.push(firstDescendant);
-      }
+        const secondDescendant = swap(
+          route2,
+          point1IndexAtSecondRoute,
+          point2IndexAtSecondRoute,
+        );
 
-      if (valid(secondDescendant)) {
-        newSols.push(secondDescendant);
+        if (valid(firstDescendant)) {
+          newSols.push(firstDescendant);
+        }
+
+        if (valid(secondDescendant)) {
+          newSols.push(secondDescendant);
+        }
       }
     }
   }
