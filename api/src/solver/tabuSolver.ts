@@ -161,7 +161,7 @@ function generateEjectBaseNeighbors(
   return neighbors;
 }
 
-function ejectBase(route: Point[], baseToEject: Point) {
+export function ejectBase(route: Point[], baseToEject: Point) {
   return route.filter((point) => point !== baseToEject);
 }
 
@@ -234,7 +234,7 @@ function getOppositeBase(bases: Point[], baseToChange: Point) {
   return bases.find((base) => base !== baseToChange) as Point;
 }
 
-function changeBase(
+export function changeBase(
   route: Point[],
   indexOfBaseToChange: number,
   replacement: Point,
@@ -244,7 +244,7 @@ function changeBase(
   return routeCopy;
 }
 
-function swap(route: Point[], i: number, j: number): Point[] {
+export function swap(route: Point[], i: number, j: number): Point[] {
   const newArray = route.slice();
   [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
 

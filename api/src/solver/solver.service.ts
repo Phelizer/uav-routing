@@ -8,6 +8,10 @@ import {
   createTabuSolver,
 } from './tabuSolver';
 import { AntColonyParams, createAntColonySolver } from './antColonySolver';
+import {
+  BeesAlgorithmParameters,
+  createBeesAlgorithmSolver,
+} from './beesAlgorithmSolver';
 
 interface CalculateRouteParams {
   pointsToObserve: Point[];
@@ -42,7 +46,18 @@ export class SolverService {
     return createAntColonySolver(antColonyParams);
   }
 
-  private solver: Solver = this.getAntColonySolver();
+  private getBeesAlgorithmSolver() {
+    const beesAlgorithmParams: BeesAlgorithmParameters = {
+      maxOfIterWithoutImpr: 30,
+      numberOfBestSolutions: 10,
+      solutionPopulationSize: 20,
+    };
+
+    const beesAlgorithmSolver = createBeesAlgorithmSolver(beesAlgorithmParams);
+    return beesAlgorithmSolver;
+  }
+
+  private solver: Solver = this.getBeesAlgorithmSolver();
   setSolver = (solver: Solver) => {
     this.solver = solver;
   };
@@ -55,60 +70,61 @@ export class SolverService {
     maxFlightTime,
     speed,
   }: CalculateRouteParams): any {
-    // const { points, bases }: { points: Point[]; bases: [Point, Point] } =
-    //   JSON.parse(fs.readFileSync(__dirname + '/../../coords.json').toString());
-    // const shuffledPoints = this.randomlyReplaceArrayElements(points);
-    // const [startBase2, anotherBase2] = bases;
-    // const maxFlightTime2: Milliseconds = 120000;
-    // const speed2: KilometersPeHour = 30;
-    // const chargeTime2 = 60000;
-    // console.time('tabu');
-    // const { route, fitness } = this.solver(
-    //   shuffledPoints,
-    //   startBase2,
-    //   anotherBase2,
-    //   chargeTime2,
-    //   maxFlightTime2,
-    //   speed2,
-    // );
-    // console.timeEnd('tabu');
-    // const calcualteFitnessByStops = createCalculateStopsFitness(bases);
-    // const calculateFitnessByTime = createCalculateTimeFitness(
-    //   speed2,
-    //   maxFlightTime2,
-    //   chargeTime2,
-    // );
-    // return {
-    //   route,
-    //   fitness,
-    //   stops: calcualteFitnessByStops(route),
-    //   totalTime: calculateFitnessByTime(route),
-    // };
+    const { points, bases }: { points: Point[]; bases: [Point, Point] } =
+      JSON.parse(fs.readFileSync(__dirname + '/../../coords.json').toString());
 
-    const bases = [startBase, anotherBase];
-
+    const shuffledPoints = this.randomlyReplaceArrayElements(points);
+    const [startBase2, anotherBase2] = bases;
+    const maxFlightTime2: Milliseconds = 120000;
+    const speed2: KilometersPeHour = 30;
+    const chargeTime2 = 60000;
+    console.time('tabu');
+    const { route, fitness } = this.solver(
+      shuffledPoints,
+      startBase2,
+      anotherBase2,
+      chargeTime2,
+      maxFlightTime2,
+      speed2,
+    );
+    console.timeEnd('tabu');
     const calcualteFitnessByStops = createCalculateStopsFitness(bases);
     const calculateFitnessByTime = createCalculateTimeFitness(
-      speed,
-      maxFlightTime,
-      chargeTime,
+      speed2,
+      maxFlightTime2,
+      chargeTime2,
     );
-
-    const { route, fitness } = this.solver(
-      pointsToObserve,
-      startBase,
-      anotherBase,
-      chargeTime,
-      maxFlightTime,
-      speed,
-    );
-
     return {
       route,
       fitness,
       stops: calcualteFitnessByStops(route),
       totalTime: calculateFitnessByTime(route),
     };
+
+    // const bases = [startBase, anotherBase];
+
+    // const calcualteFitnessByStops = createCalculateStopsFitness(bases);
+    // const calculateFitnessByTime = createCalculateTimeFitness(
+    //   speed,
+    //   maxFlightTime,
+    //   chargeTime,
+    // );
+
+    // const { route, fitness } = this.solver(
+    //   pointsToObserve,
+    //   startBase,
+    //   anotherBase,
+    //   chargeTime,
+    //   maxFlightTime,
+    //   speed,
+    // );
+
+    // return {
+    //   route,
+    //   fitness,
+    //   stops: calcualteFitnessByStops(route),
+    //   totalTime: calculateFitnessByTime(route),
+    // };
   }
 
   private randomlyReplaceArrayElements<T>(array: T[]): T[] {
