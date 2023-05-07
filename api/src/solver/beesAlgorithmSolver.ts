@@ -113,15 +113,12 @@ export const createBeesAlgorithmSolver =
         descendants.push(...getDescendants(route1, route2, valid));
       }
 
-      console.log('decs', descendants.length);
-
       for (const descendant of descendants) {
         const evaluation = evaluate(descendant);
         if (evaluation < recordEvaluation) {
           recordSol = descendant;
           recordEvaluation = evaluation;
           betterSolFound = true;
-          console.log('BETTER AT SCOUT');
         }
       }
 

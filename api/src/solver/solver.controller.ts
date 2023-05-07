@@ -1,19 +1,9 @@
 import { Body, Controller, Post, UseGuards } from '@nestjs/common';
-import { KilometersPeHour, Milliseconds, Point } from './models';
+import { CalculateRouteInputData, PerformExperimentInputData } from './models';
 import { SolverService } from './solver.service';
 import { Roles } from 'src/users/roles.decorator';
 import { Role } from 'src/users/role.enum';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
-// import { generateRandomPoint } from './generateRandomPoint';
-
-interface RequestBody {
-  pointsToObserve: Point[];
-  startBase: Point;
-  anotherBase: Point;
-  chargeTime: Milliseconds;
-  maxFlightTime: Milliseconds;
-  speed: KilometersPeHour;
-}
 
 @Controller('solver')
 export class SolverController {
@@ -22,7 +12,15 @@ export class SolverController {
   @Roles(Role.User)
   @UseGuards(JwtAuthGuard)
   @Post('solve')
-  calculateRoute(@Body() body: RequestBody): any {
+  calculateRoute(@Body() body: CalculateRouteInputData) {
     return this.solverService.calculateRoute(body);
+  }
+
+  // TODO: change role to Researcher
+  @Roles(Role.User)
+  @UseGuards(JwtAuthGuard)
+  @Post('experiment')
+  performExperiment(@Body() body: PerformExperimentInputData) {
+    return this.solverService.performExperiment(body);
   }
 }

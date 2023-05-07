@@ -1,5 +1,14 @@
 import { Injectable } from '@nestjs/common';
-import { KilometersPeHour, Milliseconds, Point, Solver } from './models';
+import {
+  AlgorithmName,
+  CalculateRouteInputData,
+  KilometersPeHour,
+  Milliseconds,
+  PerformExperimentInputData,
+  Point,
+  Result,
+  Solver,
+} from './models';
 import * as fs from 'fs-extra';
 import {
   TabuParams,
@@ -12,15 +21,7 @@ import {
   BeesAlgorithmParameters,
   createBeesAlgorithmSolver,
 } from './beesAlgorithmSolver';
-
-interface CalculateRouteParams {
-  pointsToObserve: Point[];
-  startBase: Point;
-  anotherBase: Point;
-  chargeTime: Milliseconds;
-  maxFlightTime: Milliseconds;
-  speed: KilometersPeHour;
-}
+import { Square, generateProblem } from './generateRandomPoint';
 
 @Injectable()
 export class SolverService {
@@ -58,8 +59,14 @@ export class SolverService {
   }
 
   private solver: Solver = this.getBeesAlgorithmSolver();
-  setSolver = (solver: Solver) => {
-    this.solver = solver;
+  setSolver = (algorithmName: AlgorithmName) => {
+    this.solver = this.algorithmNameMapping[algorithmName];
+  };
+
+  private readonly algorithmNameMapping: Record<AlgorithmName, Solver> = {
+    ants: this.getAntColonySolver(),
+    bees: this.getBeesAlgorithmSolver(),
+    tabu: this.getTabuSolver(),
   };
 
   calculateRoute({
@@ -69,7 +76,7 @@ export class SolverService {
     chargeTime,
     maxFlightTime,
     speed,
-  }: CalculateRouteParams): any {
+  }: CalculateRouteInputData): Result & Record<string, unknown> {
     const { points, bases }: { points: Point[]; bases: [Point, Point] } =
       JSON.parse(fs.readFileSync(__dirname + '/../../coords.json').toString());
 
@@ -125,6 +132,26 @@ export class SolverService {
     //   stops: calcualteFitnessByStops(route),
     //   totalTime: calculateFitnessByTime(route),
     // };
+  }
+
+  private readonly standardSquare: Square = {
+    leftTopPoint: { lat: 50.53509088416523, lng: 30.36908789440387 },
+    rightBottomPoint: { lat: 50.384682508571416, lng: 30.74135785432749 },
+  };
+
+  performExperiment({
+    algorithm,
+    numberOfPoints,
+    numberOfRuns,
+  }: PerformExperimentInputData) {
+    this.setSolver(algorithm);
+    const results: Result[] = [];
+    for (let i = 0; i < numberOfRuns; i++) {
+      const problem = generateProblem(this.standardSquare, numberOfPoints);
+      results.push(this.solver(...problem));
+    }
+
+    return results;
   }
 
   private randomlyReplaceArrayElements<T>(array: T[]): T[] {
