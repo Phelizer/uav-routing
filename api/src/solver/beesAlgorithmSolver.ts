@@ -163,7 +163,7 @@ function rand(minimum: number, maximum: number) {
   return Math.floor(Math.random() * (maximum - minimum)) + minimum;
 }
 
-function getKNearestPoints(point: Point, allPoints: Point[], k: number) {
+export function getKNearestPoints(point: Point, allPoints: Point[], k: number) {
   const numOfPoints = Math.ceil(allPoints.length * k);
   const distancesWithIndexes = allPoints
     .map((p, i) => {
@@ -183,7 +183,7 @@ function getKNearestPoints(point: Point, allPoints: Point[], k: number) {
   return allPoints.filter((_, i) => nearestIndexes.includes(i));
 }
 
-function getValidChanges(
+export function getValidChanges(
   route: Point[],
   nearestPointsMapping: Map<Point, Point[]>,
   valid: (route: Point[]) => boolean,

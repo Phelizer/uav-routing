@@ -1,3 +1,4 @@
+import { getKNearestPoints, getValidChanges } from './beesAlgorithmSolver';
 import { calculateTimeBetweenTwoPoints } from './calculateDistance';
 import { buildValidRoute } from './initValidSolution';
 import {
@@ -58,6 +59,11 @@ export const createTabuSolver: CreateTabuSolver =
 
     // const calculateFitness = createCalculateStopsFitness(bases);
 
+    const closestPoints = new Map<Point, Point[]>();
+    for (const point of pointsToObserve) {
+      closestPoints.set(point, getKNearestPoints(point, pointsToObserve, 0.25));
+    }
+
     const besSolutionsByRuns: Solution[] = [];
 
     for (let runNumber = 0; runNumber < numOfRuns; runNumber++) {
@@ -83,7 +89,14 @@ export const createTabuSolver: CreateTabuSolver =
         let currentFitness = bestFitness;
         let isThereFoundNeighborhood = false;
 
-        const neighbors = generateNeighbors(isValid, currentSolution, bases);
+        // const neighbors = generateNeighbors(isValid, currentSolution, bases);
+        const neighbors = getValidChanges(
+          currentSolution,
+          closestPoints,
+          isValid,
+          bases,
+        );
+
         for (const neigh of neighbors) {
           const neighborFitness = calculateFitness(neigh);
           const str = JSON.stringify(neigh);
