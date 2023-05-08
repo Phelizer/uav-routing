@@ -76,8 +76,6 @@ export const createTabuSolver: CreateTabuSolver =
         speed,
       );
 
-      console.log('INITIAL FITNESS:', initialFitness);
-
       let bestSolution = initialRoute;
 
       let bestFitness = calculateFitness(bestSolution);
