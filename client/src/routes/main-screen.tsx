@@ -98,11 +98,37 @@ export const MainScreen = observer(() => {
         Submit
       </button>
 
-      {!!bloc.solution && (
-        <>
-          <div>Result:</div>
-          <div>{bloc.solution}</div>
-        </>
+      {bloc.route.length !== 0 && (
+        <svg
+          width="60%"
+          height="60%"
+          viewBox={`${bloc.boundaries.minLng} ${bloc.boundaries.minLat} ${
+            bloc.boundaries.maxLng - bloc.boundaries.minLng
+          } ${bloc.boundaries.maxLat - bloc.boundaries.minLat}`}
+          style={{ backgroundColor: "grey", display: "block" }}
+        >
+          {bloc.points.map((p) => (
+            <circle
+              cx={p.lng}
+              cy={p.lat}
+              r="0.0001"
+              stroke="green"
+              stroke-width="0"
+              fill="yellow"
+            />
+          ))}
+
+          {bloc.bases.map((p) => (
+            <circle
+              cx={p.lng}
+              cy={p.lat}
+              r="0.0001"
+              stroke="greeb"
+              stroke-width="0.0001"
+              fill="red"
+            />
+          ))}
+        </svg>
       )}
     </div>
   );

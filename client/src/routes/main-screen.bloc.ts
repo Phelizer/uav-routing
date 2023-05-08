@@ -12,9 +12,6 @@ interface PointData extends Coords {
   isBase: boolean;
 }
 
-type Minutes = number;
-type KilometersPerHour = number;
-
 type StrMinutes = string;
 type StrKilometersPerHour = string;
 
@@ -45,8 +42,52 @@ export class MainScreenBLoC {
   private solverService = new SolverService();
 
   @computed
-  get solution() {
-    return (solutionsStoreInstance.lastSolution ?? "").toString();
+  get route() {
+    return solutionsStoreInstance.lastSolution?.route ?? [];
+  }
+
+  @computed
+  get points() {
+    return this.route.filter((p) => !p.isBase);
+  }
+
+  // TODO: refactor:
+  @computed
+  get bases() {
+    const bases = this.route.filter((p) => p.isBase);
+    const base1 = bases[0];
+    const base2 = bases.find((b) => b.lat !== base1.lat || b.lng !== base1.lng);
+    if (!base1 || !base2) {
+      return [];
+    }
+
+    const uniqueBases = [base1, base2];
+    return uniqueBases;
+  }
+
+  @computed
+  get boundaries() {
+    const minLng = this.route.reduce(
+      (min, p) => (p.lng < min ? p.lng : min),
+      180
+    );
+
+    const minLat = this.route.reduce(
+      (min, p) => (p.lat < min ? p.lat : min),
+      180
+    );
+
+    const maxLng = this.route.reduce(
+      (max, p) => (p.lng > max ? p.lng : max),
+      -180
+    );
+
+    const maxLat = this.route.reduce(
+      (max, p) => (p.lat > max ? p.lat : max),
+      -180
+    );
+
+    return { minLat, minLng, maxLat, maxLng };
   }
 
   constructor() {
