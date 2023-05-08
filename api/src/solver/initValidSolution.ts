@@ -191,3 +191,109 @@ export function determineOutcome(probabilities: number[]): number {
   const sum = probabilities.reduce((x, y) => x + y, 0);
   throw new Error(`The sum of chances should be 1. The sum is: ${sum}`);
 }
+
+// greedy algorithm
+
+export const buildGreedyRoute: Solver = (
+  pointsToObserve: Point[],
+  startBase: Point,
+  anotherBase: Point,
+  chargeTime: Milliseconds,
+  maxFlightTime: Milliseconds,
+  speed: KilometersPeHour,
+) => {
+  const route: Point[] = [startBase];
+  const bases = [startBase, anotherBase];
+  let currentPoint = startBase;
+  let unvisitedPoints = pointsToObserve;
+  let restOfFlightTime = maxFlightTime;
+  do {
+    const { pointToPick, newRestOfFlightTime, newUnvisitedPoints } =
+      findNearestAvailablePoint(
+        currentPoint,
+        unvisitedPoints,
+        bases,
+        restOfFlightTime,
+        speed,
+        maxFlightTime,
+      );
+
+    route.push(pointToPick);
+    currentPoint = pointToPick;
+    restOfFlightTime = newRestOfFlightTime;
+    unvisitedPoints = newUnvisitedPoints;
+  } while (unvisitedPoints.length !== 0 || !routeEndsInBase(bases, route));
+
+  const fitness = createCalculateTimeFitness(
+    speed,
+    maxFlightTime,
+    chargeTime,
+  )(route);
+
+  return { route, fitness };
+};
+
+export function findNearestAvailablePoint(
+  currentPoint: Point,
+  unvisitedPoints: Point[],
+  bases: Point[],
+  restOfFlightTime: Milliseconds,
+  speed: KilometersPeHour,
+  maxFlightTime: Milliseconds,
+) {
+  const availablePoints = unvisitedPoints.filter((point) =>
+    isAvailablePoint(currentPoint, point, bases, restOfFlightTime, speed),
+  );
+
+  if (unvisitedPoints.length === 0) {
+    const availableBases = bases.filter((base) =>
+      isAvailableBase(currentPoint, base, restOfFlightTime, speed),
+    );
+
+    const finishBase = findNearestBase(availableBases, currentPoint, speed);
+
+    return {
+      pointToPick: finishBase,
+      newRestOfFlightTime: maxFlightTime,
+      newUnvisitedPoints: unvisitedPoints,
+    };
+  }
+
+  if (availablePoints.length === 0) {
+    const availableBases = bases.filter((base) =>
+      isAvailableBase(currentPoint, base, restOfFlightTime, speed),
+    );
+
+    let baseToPick = availableBases[randomInt(0, availableBases.length - 1)];
+    if (bases.some((b) => b === currentPoint)) {
+      baseToPick = availableBases.find(
+        (base) => base !== currentPoint,
+      ) as Point;
+    }
+
+    return {
+      pointToPick: baseToPick,
+      newRestOfFlightTime: maxFlightTime,
+      newUnvisitedPoints: unvisitedPoints,
+    };
+  }
+
+  const times = availablePoints.map((point) =>
+    calculateTimeBetweenTwoPoints(currentPoint, point, speed),
+  );
+
+  const { indexOfNearest } = times.reduce(
+    (acc: { value: number; indexOfNearest: number }, curr, i) =>
+      curr < acc.value ? { value: curr, indexOfNearest: i } : acc,
+    { value: Infinity, indexOfNearest: 0 },
+  );
+
+  const pointToPick = availablePoints[indexOfNearest];
+
+  const newRestOfFlightTime = restOfFlightTime - times[indexOfNearest];
+  const newUnvisitedPoints = unvisitedPoints.filter(
+    (point) => point !== pointToPick,
+  );
+
+  return { pointToPick, newRestOfFlightTime, newUnvisitedPoints };
+}
