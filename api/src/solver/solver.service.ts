@@ -37,7 +37,7 @@ export class SolverService {
 
   private getAntColonySolver() {
     const antColonyParams: AntColonyParams = {
-      antsNumber: 70,
+      antsNumber: 15,
       evaporationRate: 0.2,
       heurInfoImportance: 0.5,
       pheromoneImportance: 0.5,

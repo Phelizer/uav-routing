@@ -73,7 +73,11 @@ export const createAntColonySolver: CreateAntColonySolver =
 
         let restOfPointToObserve = [...pointsToObserve];
         let restOfFlightTime = maxFlightTime;
-        while (!isValid(currentRoute)) {
+        while (
+          restOfPointToObserve.length > 0 ||
+          (restOfPointToObserve.length === 0 &&
+            !currentRoute[currentRoute.length - 1].isBase)
+        ) {
           const lastPoint = currentRoute[currentRoute.length - 1];
           const availablePoints = getAvailableMoves(
             lastPoint,

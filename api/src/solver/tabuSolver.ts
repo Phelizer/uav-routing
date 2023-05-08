@@ -316,10 +316,8 @@ function routeIncludesAllPointsToObserve(
 }
 
 function routeStartsAndEndsInBases(route: Point[]): boolean {
-  const startsWithBase = Boolean((route[0] as any).type === 'base');
-  const endsWithBase = Boolean(
-    (route[route.length - 1] as any).type === 'base',
-  );
+  const startsWithBase = route[0].isBase;
+  const endsWithBase = route[route.length - 1].isBase;
 
   return startsWithBase && endsWithBase;
 }
