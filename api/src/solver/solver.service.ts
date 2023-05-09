@@ -22,6 +22,7 @@ import {
   createBeesAlgorithmSolver,
 } from './beesAlgorithmSolver';
 import { Square, generateProblem } from './generateRandomPoint';
+import { buildGreedyRoute, buildValidRoute } from './initValidSolution';
 
 @Injectable()
 export class SolverService {
@@ -149,6 +150,11 @@ export class SolverService {
     for (let i = 0; i < numberOfRuns; i++) {
       const problem = generateProblem(this.standardSquare, numberOfPoints);
       results.push(this.solver(...problem));
+
+      const { fitness: randomFitness } = buildValidRoute(...problem);
+      const { fitness: greedyFitness } = buildGreedyRoute(...problem);
+      console.log('RANDOM_SOLUTION_FITNESS:', randomFitness);
+      console.log('GREEDY_SOLUTION_FITNESS:', greedyFitness);
     }
 
     return results;

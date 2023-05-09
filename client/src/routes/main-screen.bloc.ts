@@ -10,6 +10,7 @@ interface Coords {
 
 interface PointData extends Coords {
   isBase: boolean;
+  isStartBase: boolean;
 }
 
 type StrMinutes = string;
@@ -32,8 +33,8 @@ export class MainScreenBLoC {
   @observable
   formData: InputDataForm = {
     points: [this.createEmptyPoint()],
-    startBase: this.createEmptyBase(),
-    anotherBase: this.createEmptyBase(),
+    startBase: this.createEmptyStartBase(),
+    anotherBase: this.createEmptyNormalBase(),
     chargeTime: "",
     maxFlightTime: "",
     speed: "",
@@ -90,6 +91,18 @@ export class MainScreenBLoC {
     return { minLat, minLng, maxLat, maxLng };
   }
 
+  @computed
+  get lineData() {
+    const lineData: { source: Point; destination: Point }[] = [];
+    for (let i = 1; i < this.route.length; i++) {
+      const source = this.route[i - 1];
+      const destination = this.route[i];
+      lineData.push({ source, destination });
+    }
+
+    return lineData;
+  }
+
   constructor() {
     makeObservable(this);
   }
@@ -101,18 +114,24 @@ export class MainScreenBLoC {
     };
   }
 
-  private setPointType(type: "base" | "point") {
-    return function (coords: Coords) {
-      return { ...coords, isBase: type === "base" };
+  private createEmptyStartBase(): PointData {
+    return {
+      ...this.createEmptyCoords(),
+      isBase: true,
+      isStartBase: true,
     };
   }
 
-  private createEmptyBase() {
-    return this.setPointType("base")(this.createEmptyCoords());
+  private createEmptyNormalBase(): PointData {
+    return {
+      ...this.createEmptyCoords(),
+      isBase: true,
+      isStartBase: false,
+    };
   }
 
-  private createEmptyPoint() {
-    return this.setPointType("point")(this.createEmptyCoords());
+  private createEmptyPoint(): PointData {
+    return { ...this.createEmptyCoords(), isBase: false, isStartBase: false };
   }
 
   createPointSetter = (index: number, fieldName: "lat" | "lng") =>
@@ -182,6 +201,7 @@ export class MainScreenBLoC {
       lat: parseFloat(pointData.lat),
       lng: parseFloat(pointData.lng),
       isBase: pointData.isBase,
+      isStartBase: pointData.isStartBase,
     };
   };
 }

@@ -4,6 +4,7 @@ export interface Point {
   lat: number;
   lng: number;
   isBase: boolean;
+  isStartBase: boolean;
 }
 
 export function isPoint(value: unknown): value is Point {

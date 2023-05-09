@@ -3,6 +3,7 @@ import { Input } from "../components/input";
 import { MainScreenBLoC } from "./main-screen.bloc";
 import { Fragment, useMemo } from "react";
 import "./main-screen.css";
+import { Direction } from "../components/Direction";
 
 export const MainScreen = observer(() => {
   const bloc = useMemo(() => new MainScreenBLoC(), []);
@@ -111,9 +112,9 @@ export const MainScreen = observer(() => {
             <circle
               cx={p.lng}
               cy={p.lat}
-              r="0.0001"
+              r="0.0002"
               stroke="green"
-              stroke-width="0"
+              strokeWidth="0"
               fill="yellow"
             />
           ))}
@@ -122,10 +123,19 @@ export const MainScreen = observer(() => {
             <circle
               cx={p.lng}
               cy={p.lat}
-              r="0.0001"
+              r="0.0002"
               stroke="greeb"
-              stroke-width="0.0001"
-              fill="red"
+              strokeWidth="0.0001"
+              fill={p.isStartBase ? "green" : "red"}
+            />
+          ))}
+
+          {bloc.lineData.map(({ source, destination }, i) => (
+            <Direction
+              className="direction"
+              key={i}
+              point1={source}
+              point2={destination}
             />
           ))}
         </svg>

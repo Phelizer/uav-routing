@@ -320,6 +320,10 @@ function routeStartsAndEndsInBases(route: Point[]): boolean {
   return startsWithBase && endsWithBase;
 }
 
+function routeStartsAtStartBase(route: Point[]): boolean {
+  return route[0].isStartBase;
+}
+
 export function isValidRoute(
   route: Point[],
   maxFlightTime: Milliseconds,
@@ -344,6 +348,7 @@ export function isValidRoute(
   );
 
   const startsAndEndsInBases = routeStartsAndEndsInBases(route);
+  const startsAtStartBase = routeStartsAtStartBase(route);
 
-  return inspectsAllPoints && startsAndEndsInBases;
+  return inspectsAllPoints && startsAndEndsInBases && startsAtStartBase;
 }

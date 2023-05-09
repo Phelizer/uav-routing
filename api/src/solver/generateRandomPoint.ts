@@ -17,7 +17,7 @@ export interface Square {
 }
 
 const createGenerateRandomPoint =
-  (pointType: 'Base' | 'RegularPoint') =>
+  (pointType: 'StartBase' | 'RegularBase' | 'RegularPoint') =>
   (square: Square): Point => {
     const minimumLat = Math.min(
       square.leftTopPoint.lat,
@@ -42,12 +42,15 @@ const createGenerateRandomPoint =
     return {
       lat: randomRealNumber(minimumLat, maximumLat),
       lng: randomRealNumber(minimumLng, maximumLng),
-      isBase: pointType === 'Base',
+      isBase: pointType !== 'RegularPoint',
+      isStartBase: pointType === 'StartBase',
     };
   };
 
 export const generateRandomPoint = createGenerateRandomPoint('RegularPoint');
-export const generateRandomBase = createGenerateRandomPoint('Base');
+export const generateRandomStartBase = createGenerateRandomPoint('StartBase');
+export const generateRandomRegularBase =
+  createGenerateRandomPoint('RegularBase');
 
 export function getSafeMaxFlightTime(square: Square, speed: KilometersPeHour) {
   const maxSingleFlightFlightTime = calculateTimeBetweenTwoPoints(
@@ -73,8 +76,8 @@ export function generateProblem(
     pointsToObserve.push(generateRandomPoint(square));
   }
 
-  const startBase = generateRandomBase(square);
-  const anotherBase = generateRandomBase(square);
+  const startBase = generateRandomStartBase(square);
+  const anotherBase = generateRandomRegularBase(square);
   const speed = 70;
   const maxFlightTime = getSafeMaxFlightTime(square, speed);
   const changeTime = 5 * millisecInMin;
