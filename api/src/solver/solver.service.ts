@@ -80,7 +80,6 @@ export class SolverService {
   }: CalculateRouteInputData): Result & Record<string, unknown> {
     const { points, bases }: { points: Point[]; bases: [Point, Point] } =
       JSON.parse(fs.readFileSync(__dirname + '/../../coords.json').toString());
-
     const shuffledPoints = this.randomlyReplaceArrayElements(points);
     const [startBase2, anotherBase2] = bases;
     const maxFlightTime2: Milliseconds = 120000;
@@ -110,14 +109,12 @@ export class SolverService {
     };
 
     // const bases = [startBase, anotherBase];
-
     // const calcualteFitnessByStops = createCalculateStopsFitness(bases);
     // const calculateFitnessByTime = createCalculateTimeFitness(
     //   speed,
     //   maxFlightTime,
     //   chargeTime,
     // );
-
     // const { route, fitness } = this.solver(
     //   pointsToObserve,
     //   startBase,
@@ -126,7 +123,7 @@ export class SolverService {
     //   maxFlightTime,
     //   speed,
     // );
-
+    // console.log({ ft: calculateFitnessByTime(route) });
     // return {
     //   route,
     //   fitness,
