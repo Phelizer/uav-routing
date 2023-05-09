@@ -18,3 +18,19 @@ export function isPoint(value: unknown): value is Point {
     isBoolean(value.isBase)
   );
 }
+
+export const ALGORITHMS = ["tabu", "bees", "ants"] as const;
+export type Algo = (typeof ALGORITHMS)[number];
+
+export interface Solution {
+  fitness: number;
+  route: Point[];
+}
+
+export const isSolution = (value: unknown): value is Solution =>
+  isRecord(value) &&
+  "route" in value &&
+  Array.isArray(value.route) &&
+  value.route.every(isPoint) &&
+  "fitness" in value &&
+  isNumber(value.fitness);

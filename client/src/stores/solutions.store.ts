@@ -1,9 +1,12 @@
 import { makeObservable, observable } from "mobx";
-import { Point } from "../models";
+import { Solution } from "../models";
 
 class SolutionsStore {
   @observable
-  lastSolution: { route: Point[]; fitness: number } | null = null;
+  lastSolution: Solution | null = null;
+
+  @observable
+  lastExperimentSolutions: Solution[] = [];
 
   constructor() {
     makeObservable(this);

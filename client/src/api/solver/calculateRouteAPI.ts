@@ -1,5 +1,4 @@
-import { Point, isPoint } from "../../models";
-import { isNumber, isRecord } from "../../utils/utils";
+import { Point, isSolution } from "../../models";
 import { API_BASE_URL } from "../consts";
 import { fetchAPI } from "../fetchAPI";
 import { getStandardHeaders } from "../getStandardHeaders";
@@ -21,18 +20,5 @@ export async function calculateRouteAPI(body: CalculateRouteData) {
     headers: getStandardHeaders(),
   };
 
-  const typeguard = (
-    value: unknown
-  ): value is {
-    route: Point[];
-    fitness: number;
-  } =>
-    isRecord(value) &&
-    "route" in value &&
-    Array.isArray(value.route) &&
-    value.route.every(isPoint) &&
-    "fitness" in value &&
-    isNumber(value.fitness);
-
-  return await fetchAPI(url, typeguard, options);
+  return await fetchAPI(url, isSolution, options);
 }

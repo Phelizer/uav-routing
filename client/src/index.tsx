@@ -5,6 +5,8 @@ import reportWebVitals from "./reportWebVitals";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import ErrorPage from "./error-page";
 import { AuthWrapper } from "./AuthWrapper";
+import { WithNavBar } from "./WithNavBar";
+import { ExperimentScreen } from "./routes/experiment-screen";
 
 // TODO: remove this verification code:
 if (
@@ -19,6 +21,14 @@ const router = createBrowserRouter([
     path: "/",
     element: <AuthWrapper />,
     errorElement: <ErrorPage />,
+  },
+  {
+    path: "/experiment",
+    element: (
+      <WithNavBar>
+        <ExperimentScreen />
+      </WithNavBar>
+    ),
   },
 ]);
 
