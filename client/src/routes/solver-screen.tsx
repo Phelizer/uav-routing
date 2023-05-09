@@ -99,6 +99,7 @@ export const SolverScreen = observer(() => {
           coordinates={bloc.coords}
           arrowPairs={bloc.arrows}
           coloredPoints={bloc.colors}
+          delay={500}
         />
       )}
     </div>
@@ -109,13 +110,14 @@ interface PointComponentProps {
   coordinates: [number, number][];
   arrowPairs: [number, number][];
   coloredPoints: string[];
+  delay: number;
 }
 
-// TODO: refactor
 const PointComponent = ({
   coordinates,
   arrowPairs,
   coloredPoints,
+  delay,
 }: PointComponentProps) => {
   const d3Container = useRef(null);
   const [width, setWidth] = useState(window.innerWidth * 0.8);
@@ -135,6 +137,9 @@ const PointComponent = ({
   }, []);
 
   useEffect(() => {
+    // @ts-ignore
+    const timeouts = [];
+
     if (coordinates && d3Container.current) {
       const svg = d3.select(d3Container.current);
 
@@ -160,7 +165,7 @@ const PointComponent = ({
       // Setup the scales
       const xScale = d3
         .scaleLinear()
-        // @ts-ignore
+        //@ts-ignore
         .domain([
           d3.min(coordinates, (d) => d[0]),
           d3.max(coordinates, (d) => d[0]),
@@ -169,26 +174,12 @@ const PointComponent = ({
 
       const yScale = d3
         .scaleLinear()
-        // @ts-ignore
+        //@ts-ignore
         .domain([
           d3.min(coordinates, (d) => d[1]),
           d3.max(coordinates, (d) => d[1]),
         ])
         .range([height, 0]);
-
-      // Draw the lines and arrowheads
-      if (arrowPairs) {
-        arrowPairs.forEach(([i, j]) => {
-          svg
-            .append("svg:line")
-            .attr("x1", xScale(coordinates[i][0]))
-            .attr("y1", yScale(coordinates[i][1]))
-            .attr("x2", xScale(coordinates[j][0]))
-            .attr("y2", yScale(coordinates[j][1]))
-            .attr("marker-end", "url(#arrow)")
-            .style("stroke", "black");
-        });
-      }
 
       // Draw the points
       svg
@@ -201,7 +192,29 @@ const PointComponent = ({
         .style("fill", (d, i) =>
           coloredPoints && coloredPoints[i] ? coloredPoints[i] : "steelblue"
         );
+
+      // Draw the lines and arrowheads
+      if (arrowPairs) {
+        arrowPairs.forEach(([i, j], index) => {
+          const timeout = setTimeout(() => {
+            svg
+              .append("svg:line")
+              .attr("x1", xScale(coordinates[i][0]))
+              .attr("y1", yScale(coordinates[i][1]))
+              .attr("x2", xScale(coordinates[j][0]))
+              .attr("y2", yScale(coordinates[j][1]))
+              .attr("marker-end", "url(#arrow)")
+              .style("stroke", "black");
+          }, index * delay); // delay of 1 second per arrow
+          timeouts.push(timeout);
+        });
+      }
     }
+
+    return () => {
+      //@ts-ignore
+      timeouts.forEach(clearTimeout);
+    };
   }, [coordinates, width, height, arrowPairs, coloredPoints]);
 
   return (
