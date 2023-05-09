@@ -67,6 +67,48 @@ export class SolverScreenBLoC {
   }
 
   @computed
+  private get xDiff() {
+    const maxLng = this.route.reduce(
+      (max, p) => (p.lng > max ? p.lng : max),
+      -180
+    );
+
+    const minLng = this.route.reduce(
+      (min, p) => (p.lng < min ? p.lng : min),
+      180
+    );
+
+    return Math.abs(maxLng - minLng);
+  }
+
+  @computed
+  private get yDiff() {
+    const minLat = this.route.reduce(
+      (min, p) => (p.lat < min ? p.lat : min),
+      180
+    );
+
+    const maxLat = this.route.reduce(
+      (max, p) => (p.lat > max ? p.lat : max),
+      -180
+    );
+
+    return Math.abs(maxLat - minLat);
+  }
+
+  readonly offset = 0.08;
+
+  @computed
+  get xOffset() {
+    return this.xDiff * this.offset;
+  }
+
+  @computed
+  get yOffset() {
+    return this.yDiff * this.offset;
+  }
+
+  @computed
   get boundaries() {
     const minLng = this.route.reduce(
       (min, p) => (p.lng < min ? p.lng : min),
@@ -204,4 +246,40 @@ export class SolverScreenBLoC {
       isStartBase: pointData.isStartBase,
     };
   };
+
+  @computed
+  get circleRadius() {
+    return `${this.yDiff * 0.01}`;
+  }
+
+  @computed
+  get lineThickness() {
+    return `${this.yDiff * 0.002}`;
+  }
+
+  @computed
+  get markerThickness() {
+    return `${this.yDiff * 100}`;
+  }
+
+  @computed
+  get coords(): [number, number][] {
+    // const allPoints = [...this.points, ...this.bases];
+    const allPoints = this.route;
+    return allPoints.map(({ lng, lat }) => [lng, lat]);
+  }
+
+  @computed
+  get arrows(): [number, number][] {
+    const lineData: [number, number][] = [];
+    for (let i = 1; i < this.route.length; i++) {
+      const sourceIndex = i - 1;
+      const destinationIndex = i;
+      lineData.push([sourceIndex, destinationIndex]);
+    }
+
+    console.log("SUCCESS", lineData.length);
+
+    return lineData;
+  }
 }
