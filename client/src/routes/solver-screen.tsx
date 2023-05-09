@@ -94,9 +94,12 @@ export const SolverScreen = observer(() => {
         Submit
       </button>
 
-      <div>Kal:</div>
       {bloc.arrows.length !== 0 && bloc.coords.length !== 0 && (
-        <PointComponent coordinates={bloc.coords} arrowPairs={bloc.arrows} />
+        <PointComponent
+          coordinates={bloc.coords}
+          arrowPairs={bloc.arrows}
+          coloredPoints={bloc.colors}
+        />
       )}
     </div>
   );
@@ -105,10 +108,15 @@ export const SolverScreen = observer(() => {
 interface PointComponentProps {
   coordinates: [number, number][];
   arrowPairs: [number, number][];
+  coloredPoints: string[];
 }
 
 // TODO: refactor
-const PointComponent = ({ coordinates, arrowPairs }: PointComponentProps) => {
+const PointComponent = ({
+  coordinates,
+  arrowPairs,
+  coloredPoints,
+}: PointComponentProps) => {
   const d3Container = useRef(null);
   const [width, setWidth] = useState(window.innerWidth * 0.8);
   const [height, setHeight] = useState(window.innerHeight * 0.8);
@@ -149,12 +157,10 @@ const PointComponent = ({ coordinates, arrowPairs }: PointComponentProps) => {
         .append("svg:path")
         .attr("d", "M0,-5L10,0L0,5");
 
-      console.log("1");
-
       // Setup the scales
       const xScale = d3
         .scaleLinear()
-        //@ts-ignore
+        // @ts-ignore
         .domain([
           d3.min(coordinates, (d) => d[0]),
           d3.max(coordinates, (d) => d[0]),
@@ -163,22 +169,16 @@ const PointComponent = ({ coordinates, arrowPairs }: PointComponentProps) => {
 
       const yScale = d3
         .scaleLinear()
-        //@ts-ignore
+        // @ts-ignore
         .domain([
           d3.min(coordinates, (d) => d[1]),
           d3.max(coordinates, (d) => d[1]),
         ])
         .range([height, 0]);
 
-      console.log("2");
-
       // Draw the lines and arrowheads
       if (arrowPairs) {
-        //@ts-ignore
         arrowPairs.forEach(([i, j]) => {
-          console.log({ HERE: [i, j] });
-          console.log({ coords: coordinates });
-          console.log({ arrws: arrowPairs.length });
           svg
             .append("svg:line")
             .attr("x1", xScale(coordinates[i][0]))
@@ -190,20 +190,19 @@ const PointComponent = ({ coordinates, arrowPairs }: PointComponentProps) => {
         });
       }
 
-      console.log("3");
-
       // Draw the points
       svg
         .selectAll("circle")
         .data(coordinates)
         .join("circle")
-        .attr("cx", (d) => xScale(d[0]))
-        .attr("cy", (d) => yScale(d[1]))
+        .attr("cx", (d, i) => xScale(d[0]))
+        .attr("cy", (d, i) => yScale(d[1]))
         .attr("r", 5)
-        .style("fill", "steelblue");
+        .style("fill", (d, i) =>
+          coloredPoints && coloredPoints[i] ? coloredPoints[i] : "steelblue"
+        );
     }
-    console.log("4");
-  }, [coordinates, width, height, arrowPairs]);
+  }, [coordinates, width, height, arrowPairs, coloredPoints]);
 
   return (
     <svg

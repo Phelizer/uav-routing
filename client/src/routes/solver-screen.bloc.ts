@@ -282,4 +282,18 @@ export class SolverScreenBLoC {
 
     return lineData;
   }
+  @computed
+  get colors() {
+    return this.route.map(({ isBase, isStartBase }) => {
+      if (isStartBase) {
+        return "green";
+      }
+
+      if (isBase) {
+        return "red";
+      }
+
+      return "steelblue";
+    });
+  }
 }
