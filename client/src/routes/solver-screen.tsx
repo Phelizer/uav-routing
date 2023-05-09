@@ -1,12 +1,12 @@
 import { observer } from "mobx-react-lite";
 import { Input } from "../components/input";
-import { MainScreenBLoC } from "./main-screen.bloc";
+import { SolverScreenBLoC } from "./solver-screen.bloc";
 import { Fragment, useMemo } from "react";
-import "./main-screen.css";
+import "./solver-screen.css";
 import { Direction } from "../components/Direction";
 
-export const MainScreen = observer(() => {
-  const bloc = useMemo(() => new MainScreenBLoC(), []);
+export const SolverScreen = observer(() => {
+  const bloc = useMemo(() => new SolverScreenBLoC(), []);
 
   return (
     <div>

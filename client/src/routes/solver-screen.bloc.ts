@@ -29,7 +29,7 @@ type StringFieldsOfInputDataForm = {
   [Key in keyof InputDataForm]: InputDataForm[Key] extends string ? Key : never;
 }[keyof InputDataForm];
 
-export class MainScreenBLoC {
+export class SolverScreenBLoC {
   @observable
   formData: InputDataForm = {
     points: [this.createEmptyPoint()],
