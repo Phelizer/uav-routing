@@ -4,9 +4,12 @@ import { appStateStoreInstance } from "../stores/app-state.store";
 
 export class AuthService {
   login = async (loginData: LoginData) => {
-    const accessToken = await loginAPI(loginData);
+    const { access_token, roles } = await loginAPI(loginData);
     runInAction(() => {
-      appStateStoreInstance.setAccessToken(accessToken);
+      appStateStoreInstance.setAccessToken(access_token);
+      appStateStoreInstance.roles = roles;
     });
   };
+
+  logout = appStateStoreInstance.logout;
 }

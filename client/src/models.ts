@@ -34,3 +34,5 @@ export const isSolution = (value: unknown): value is Solution =>
   value.route.every(isPoint) &&
   "fitness" in value &&
   isNumber(value.fitness);
+
+export type Role = "user" | "researcher";

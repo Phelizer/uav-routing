@@ -107,6 +107,10 @@ export class ExperimentScreenBLoC {
 
   @computed
   get standardDeviation() {
+    if (this.fitnesses.length === 0) {
+      return 0;
+    }
+
     const stDev = Math.sqrt(
       this.fitnesses
         .map((x) => Math.pow(x - this.meanFitness, 2))

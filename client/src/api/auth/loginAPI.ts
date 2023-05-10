@@ -1,3 +1,4 @@
+import { Role } from "../../models";
 import { isRecord, isString } from "../../utils/utils";
 import { API_BASE_URL } from "../consts";
 import { fetchAPI } from "../fetchAPI";
@@ -20,9 +21,14 @@ export async function loginAPI(body: LoginData) {
     value: unknown
   ): value is {
     access_token: string;
+    roles: Role[];
   } =>
-    isRecord(value) && "access_token" in value && isString(value.access_token);
+    isRecord(value) &&
+    "access_token" in value &&
+    isString(value.access_token) &&
+    "roles" in value &&
+    Array.isArray(value.roles) &&
+    value.roles.every(isString);
 
-  const { access_token } = await fetchAPI(url, typeguard, options);
-  return access_token;
+  return await fetchAPI(url, typeguard, options);
 }

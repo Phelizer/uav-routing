@@ -6,8 +6,9 @@ import "./experiment-screen.css";
 import { Dropdown } from "../components/dropdown";
 import { ALGORITHMS } from "../models";
 import { isNumber } from "../utils/utils";
+import { researcherOnly } from "../researcherOnly";
 
-export const ExperimentScreen = observer(() => {
+const ExperimentScreen_ = observer(() => {
   const bloc = useMemo(() => new ExperimentScreenBLoC(), []);
 
   return (
@@ -61,3 +62,5 @@ export const ExperimentScreen = observer(() => {
     </div>
   );
 });
+
+export const ExperimentScreen = researcherOnly(ExperimentScreen_);

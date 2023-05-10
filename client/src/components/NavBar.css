@@ -1,0 +1,10 @@
+.nav-bar-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.logout-button {
+    width: 5vw;
+    height: 5vh;
+}
