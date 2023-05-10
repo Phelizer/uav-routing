@@ -54,12 +54,23 @@ export const createAntColonySolver: CreateAntColonySolver =
       0.1,
     );
 
-    const calculateProbability = createCalculateProbability(
-      pheromoneState,
-      pheromoneImportance,
-      heurInfoImportance,
-      calculateFitness,
-    );
+    // const calculateProbability = createCalculateProbability(
+    //   pheromoneState,
+    //   pheromoneImportance,
+    //   heurInfoImportance,
+    //   calculateFitness,
+    // );
+
+    const timeToNext = (p1: Point, p2: Point) =>
+      calculateTimeBetweenTwoPoints(p1, p2, speed);
+
+    const capculateProbability_experimental =
+      createCalculateProbability_EXPERIMANTAL(
+        pheromoneState,
+        pheromoneImportance,
+        heurInfoImportance,
+        timeToNext,
+      );
 
     const antsSolutions: Point[][] = [];
 
@@ -88,7 +99,7 @@ export const createAntColonySolver: CreateAntColonySolver =
           );
 
           const probabilities = availablePoints.map((point) =>
-            calculateProbability(currentRoute, point),
+            capculateProbability_experimental(currentRoute, point),
           );
 
           const normalizedProbs = normProbs(probabilities);
@@ -122,14 +133,21 @@ export const createAntColonySolver: CreateAntColonySolver =
       }
 
       pheromoneState.evaporateAll();
-      for (let numOfAnt = 0; numOfAnt < antsNumber; numOfAnt++) {
-        const sol = antsSolutions[numOfAnt];
-        const estimation = calculateFitness(sol);
-        for (let i = 0; i < sol.length - 2; i++) {
-          const curr = sol[i];
-          const next = sol[i + 1];
-          pheromoneState.add(curr, next, estimation);
-        }
+
+      // for (let numOfAnt = 0; numOfAnt < antsNumber; numOfAnt++) {
+      //   const sol = antsSolutions[numOfAnt];
+      //   const estimation = calculateFitness(sol);
+      //   for (let i = 0; i < sol.length - 2; i++) {
+      //     const curr = sol[i];
+      //     const next = sol[i + 1];
+      //     pheromoneState.add(curr, next, estimation);
+      //   }
+      // }
+
+      for (let i = 0; i < bestSolution.length - 2; i++) {
+        const curr = bestSolution[i];
+        const next = bestSolution[i + 1];
+        pheromoneState.add(curr, next, bestEstimation);
       }
 
       if (wasBestSolUpdated) {
@@ -147,21 +165,38 @@ function normProbs(probabilities: number[]) {
   return probabilities.map((p) => p / sumOfProbs);
 }
 
-const createCalculateProbability =
+// const createCalculateProbability =
+//   (
+//     pherState: PheromoneState,
+//     pheromoneImportance: number,
+//     heurInfoImportance: number,
+//     calcFitness: (route: Point[]) => number,
+//   ) =>
+//   (currentRoute: Point[], nextPoint: Point) => {
+//     const currentPoint = currentRoute[currentRoute.length - 1];
+//     const estimation = calcFitness([...currentRoute, nextPoint]) || 1;
+
+//     return (
+//       Math.pow(pherState.get(currentPoint, nextPoint), pheromoneImportance) *
+//       Math.pow(estimation, heurInfoImportance)
+//     );
+//   };
+
+const createCalculateProbability_EXPERIMANTAL =
   (
     pherState: PheromoneState,
     pheromoneImportance: number,
     heurInfoImportance: number,
-    calcFitness: (route: Point[]) => number,
+    calTimeBetweenTwoPoints: (p1: Point, p2: Point) => number,
   ) =>
   (currentRoute: Point[], nextPoint: Point) => {
     const currentPoint = currentRoute[currentRoute.length - 1];
-    const estimation = calcFitness([...currentRoute, nextPoint]) || 1;
-
-    return (
+    const estimation = calTimeBetweenTwoPoints(currentPoint, nextPoint);
+    const res =
       Math.pow(pherState.get(currentPoint, nextPoint), pheromoneImportance) *
-      Math.pow(estimation, heurInfoImportance)
-    );
+      Math.pow(1 / estimation, heurInfoImportance);
+
+    return res;
   };
 
 function getAvailableMoves(

@@ -137,6 +137,10 @@ export function isAvailablePoint(
   restOfFlightTime: Milliseconds,
   speed: KilometersPeHour,
 ): boolean {
+  if (currentPoint === anotherPoint) {
+    return false;
+  }
+
   const forwardTime = calculateTimeBetweenTwoPoints(
     currentPoint,
     anotherPoint,
@@ -159,6 +163,10 @@ export function isAvailableBase(
   restOfFlightTime: Milliseconds,
   speed: KilometersPeHour,
 ): boolean {
+  if (currentPoint === base) {
+    return false;
+  }
+
   const forwardTime = calculateTimeBetweenTwoPoints(currentPoint, base, speed);
 
   if (forwardTime <= restOfFlightTime) {
