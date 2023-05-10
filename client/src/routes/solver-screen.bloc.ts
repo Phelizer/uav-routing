@@ -288,10 +288,9 @@ export class SolverScreenBLoC {
       lineData.push([sourceIndex, destinationIndex]);
     }
 
-    console.log("SUCCESS", lineData.length);
-
     return lineData;
   }
+
   @computed
   get colors() {
     return this.route.map(({ isBase, isStartBase }) => {
@@ -305,5 +304,15 @@ export class SolverScreenBLoC {
 
       return "steelblue";
     });
+  }
+
+  private readonly SEPARATOR = " ➔ ";
+
+  @computed
+  get stringifiedResult() {
+    return this.route.reduce(
+      (acc, { label }, i) => acc + (i !== 0 ? this.SEPARATOR : "") + label,
+      ""
+    );
   }
 }

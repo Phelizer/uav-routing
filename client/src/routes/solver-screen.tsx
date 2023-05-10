@@ -95,13 +95,25 @@ export const SolverScreen = observer(() => {
         Submit
       </button>
 
+      {!!bloc.stringifiedResult && (
+        <>
+          <div className="withLeftMargin withTopMargin">RESULT:</div>
+          <div className="withLeftMargin withTopMargin withBottomMargin">
+            <b>{bloc.stringifiedResult}</b>
+          </div>
+        </>
+      )}
+
       {bloc.arrows.length !== 0 && bloc.coords.length !== 0 && (
-        <PointComponent
-          coordinates={bloc.coords}
-          arrowPairs={bloc.arrows}
-          coloredPoints={bloc.colors}
-          delay={500}
-        />
+        <div className="canvContainer">
+          <PointComponent
+            className="canv"
+            coordinates={bloc.coords}
+            arrowPairs={bloc.arrows}
+            coloredPoints={bloc.colors}
+            delay={500}
+          />
+        </div>
       )}
     </div>
   );
@@ -112,6 +124,7 @@ interface PointComponentProps {
   arrowPairs: [number, number][];
   coloredPoints: string[];
   delay: number;
+  className?: string;
 }
 
 const PointComponent = ({
@@ -119,6 +132,7 @@ const PointComponent = ({
   arrowPairs,
   coloredPoints,
   delay,
+  className,
 }: PointComponentProps) => {
   const d3Container = useRef(null);
   const [width, setWidth] = useState(window.innerWidth * 0.8);
@@ -220,7 +234,7 @@ const PointComponent = ({
 
   return (
     <svg
-      className="d3-component"
+      className={className}
       width={width}
       height={height}
       ref={d3Container}
