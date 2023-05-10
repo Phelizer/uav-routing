@@ -17,7 +17,7 @@ export class SolverController {
   }
 
   // TODO: change role to Researcher
-  @Roles(Role.User)
+  @Roles(Role.Researcher)
   @UseGuards(JwtAuthGuard)
   @Post('experiment')
   performExperiment(@Body() body: PerformExperimentInputData) {

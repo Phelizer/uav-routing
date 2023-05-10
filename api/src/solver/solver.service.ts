@@ -39,9 +39,9 @@ export class SolverService {
   private getAntColonySolver() {
     const antColonyParams: AntColonyParams = {
       antsNumber: 15,
-      evaporationRate: 0.2,
+      evaporationRate: 0.1,
       heurInfoImportance: 0.5,
-      pheromoneImportance: 0.5,
+      pheromoneImportance: 5,
       maxIterationsWithoutImprovement: 30,
     };
 
@@ -142,9 +142,11 @@ export class SolverService {
     numberOfPoints,
     numberOfRuns,
   }: PerformExperimentInputData) {
+    console.log('here');
     this.setSolver(algorithm);
     const results: Result[] = [];
     for (let i = 0; i < numberOfRuns; i++) {
+      console.log('iter', i);
       const problem = generateProblem(this.standardSquare, numberOfPoints);
       results.push(this.solver(...problem));
 
