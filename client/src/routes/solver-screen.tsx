@@ -10,7 +10,7 @@ export const SolverScreen = observer(() => {
 
   return (
     <div>
-      {bloc.formData.points.map((_, i, { length }) => (
+      {bloc.formData.points.map((pointData, i, { length }) => (
         <Fragment key={i}>
           <div className="withLeftMargin">{`Point ${i + 1}:`}</div>
           <div
@@ -31,15 +31,19 @@ export const SolverScreen = observer(() => {
               onChange={bloc.createPointSetter(i, "lng")}
               value={bloc.formData.points[i].lng.toString()}
             />
+
+            <div>Label: {pointData.label}</div>
           </div>
         </Fragment>
       ))}
+
       <button
         className="withLeftMargin withBottomMargin"
         onClick={bloc.addPoint}
       >
         Add point
       </button>
+
       <div className="withLeftMargin">Start base:</div>
       <div className="row withLeftMargin withBottomMargin">
         <Input
@@ -48,13 +52,17 @@ export const SolverScreen = observer(() => {
           onChange={bloc.setStartBaseLat}
           value={bloc.formData.startBase.lat}
         />
+
         <Input
           className="withRightMargin"
           label="Longitude"
           onChange={bloc.setStartBaseLng}
           value={bloc.formData.startBase.lng}
         />
+
+        <div>Label: Base 1</div>
       </div>
+
       <div className="withLeftMargin">Another base:</div>
       <div className="row withLeftMargin withBottomMargin">
         <Input
@@ -63,13 +71,17 @@ export const SolverScreen = observer(() => {
           onChange={bloc.setAnotherBaseLat}
           value={bloc.formData.anotherBase.lat}
         />
+
         <Input
           className="withRightMargin"
           label="Longitude"
           onChange={bloc.setAnotherBaseLng}
           value={bloc.formData.anotherBase.lng}
         />
+
+        <div>Label: Base 2</div>
       </div>
+
       <div className="row withLeftMargin withBottomMargin">
         <Input
           className="withRightMargin"
@@ -111,7 +123,9 @@ export const SolverScreen = observer(() => {
             coordinates={bloc.coords}
             arrowPairs={bloc.arrows}
             coloredPoints={bloc.colors}
-            delay={500}
+            delay={300}
+            xOffsetInCoordinates={bloc.xOffsetInCoordinates}
+            yOffsetInCoordinates={bloc.yOffsetInCoordinates}
           />
         </div>
       )}
@@ -125,6 +139,8 @@ interface PointComponentProps {
   coloredPoints: string[];
   delay: number;
   className?: string;
+  xOffsetInCoordinates?: number;
+  yOffsetInCoordinates?: number;
 }
 
 const PointComponent = ({
@@ -133,6 +149,8 @@ const PointComponent = ({
   coloredPoints,
   delay,
   className,
+  xOffsetInCoordinates = 0,
+  yOffsetInCoordinates = 0,
 }: PointComponentProps) => {
   const d3Container = useRef(null);
   const [width, setWidth] = useState(window.innerWidth * 0.8);
@@ -182,8 +200,9 @@ const PointComponent = ({
         .scaleLinear()
         //@ts-ignore
         .domain([
-          d3.min(coordinates, (d) => d[0]),
-          d3.max(coordinates, (d) => d[0]),
+          //@ts-ignore
+          d3.min(coordinates, (d) => d[0] - xOffsetInCoordinates),
+          d3.max(coordinates, (d) => d[0] + xOffsetInCoordinates),
         ])
         .range([0, width]);
 
@@ -191,8 +210,8 @@ const PointComponent = ({
         .scaleLinear()
         //@ts-ignore
         .domain([
-          d3.min(coordinates, (d) => d[1]),
-          d3.max(coordinates, (d) => d[1]),
+          d3.min(coordinates, (d) => d[1] - yOffsetInCoordinates),
+          d3.max(coordinates, (d) => d[1] + yOffsetInCoordinates),
         ])
         .range([height, 0]);
 

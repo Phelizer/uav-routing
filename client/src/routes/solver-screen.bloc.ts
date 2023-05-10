@@ -97,18 +97,6 @@ export class SolverScreenBLoC {
     return Math.abs(maxLat - minLat);
   }
 
-  readonly offset = 0.08;
-
-  @computed
-  get xOffset() {
-    return this.xDiff * this.offset;
-  }
-
-  @computed
-  get yOffset() {
-    return this.yDiff * this.offset;
-  }
-
   @computed
   get boundaries() {
     const minLng = this.route.reduce(
@@ -180,7 +168,7 @@ export class SolverScreenBLoC {
       ...this.createEmptyCoords(),
       isBase: false,
       isStartBase: false,
-      label: `Point ${this.formData?.points?.length ?? 0 + 1}`,
+      label: `Point ${(this.formData?.points?.length ?? 0) + 1}`,
     };
   }
 
@@ -314,5 +302,17 @@ export class SolverScreenBLoC {
       (acc, { label }, i) => acc + (i !== 0 ? this.SEPARATOR : "") + label,
       ""
     );
+  }
+
+  readonly offset = 0.05;
+
+  @computed
+  get xOffsetInCoordinates() {
+    return this.xDiff * this.offset;
+  }
+
+  @computed
+  get yOffsetInCoordinates() {
+    return this.yDiff * this.offset;
   }
 }
