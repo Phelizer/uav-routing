@@ -1,10 +1,34 @@
 import { Point } from './models';
 
 const mockedPoints: Point[] = [
-  { isStartBase: false, isBase: false, lat: 37.7749, lng: -122.4194 },
-  { isStartBase: false, isBase: false, lat: 37.7833, lng: -122.4167 },
-  { isStartBase: false, isBase: false, lat: 37.7942, lng: -122.407 },
-  { isStartBase: false, isBase: false, lat: 37.7959, lng: -122.4111 },
+  {
+    label: 'Point 1',
+    isStartBase: false,
+    isBase: false,
+    lat: 37.7749,
+    lng: -122.4194,
+  },
+  {
+    label: 'Point 2',
+    isStartBase: false,
+    isBase: false,
+    lat: 37.7833,
+    lng: -122.4167,
+  },
+  {
+    label: 'Point 3',
+    isStartBase: false,
+    isBase: false,
+    lat: 37.7942,
+    lng: -122.407,
+  },
+  {
+    label: 'Point 4',
+    isStartBase: false,
+    isBase: false,
+    lat: 37.7959,
+    lng: -122.4111,
+  },
 ];
 
 const mockedStartBase: Point = {
@@ -12,11 +36,24 @@ const mockedStartBase: Point = {
   isBase: true,
   lat: 37.7777,
   lng: -122.4205,
+  label: 'Base 1',
 };
 
 const mockedRestOfBases: Point[] = [
-  { isStartBase: false, isBase: true, lat: 37.7844, lng: -122.4179 },
-  { isStartBase: false, isBase: true, lat: 37.7947, lng: -122.4174 },
+  {
+    label: 'Base 2',
+    isStartBase: false,
+    isBase: true,
+    lat: 37.7844,
+    lng: -122.4179,
+  },
+  {
+    label: 'Base 3',
+    isStartBase: false,
+    isBase: true,
+    lat: 37.7947,
+    lng: -122.4174,
+  },
 ];
 
 const milisecondsInMin = 60000;

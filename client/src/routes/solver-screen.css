@@ -14,3 +14,7 @@
 .withBottomMargin {
     margin-bottom: 3vh;
 }
+
+.d3-component {
+    background-color: 'grey';
+}

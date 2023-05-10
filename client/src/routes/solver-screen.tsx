@@ -90,6 +90,7 @@ export const SolverScreen = observer(() => {
           value={bloc.formData.speed}
         />
       </div>
+
       <button className="withLeftMargin" onClick={bloc.submitForm}>
         Submit
       </button>

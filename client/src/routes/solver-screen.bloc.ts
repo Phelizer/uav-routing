@@ -11,6 +11,7 @@ interface Coords {
 interface PointData extends Coords {
   isBase: boolean;
   isStartBase: boolean;
+  label: string;
 }
 
 type StrMinutes = string;
@@ -161,6 +162,7 @@ export class SolverScreenBLoC {
       ...this.createEmptyCoords(),
       isBase: true,
       isStartBase: true,
+      label: "Base 1",
     };
   }
 
@@ -169,11 +171,17 @@ export class SolverScreenBLoC {
       ...this.createEmptyCoords(),
       isBase: true,
       isStartBase: false,
+      label: "Base 2",
     };
   }
 
   private createEmptyPoint(): PointData {
-    return { ...this.createEmptyCoords(), isBase: false, isStartBase: false };
+    return {
+      ...this.createEmptyCoords(),
+      isBase: false,
+      isStartBase: false,
+      label: `Point ${this.formData?.points?.length ?? 0 + 1}`,
+    };
   }
 
   createPointSetter = (index: number, fieldName: "lat" | "lng") =>
@@ -244,6 +252,7 @@ export class SolverScreenBLoC {
       lng: parseFloat(pointData.lng),
       isBase: pointData.isBase,
       isStartBase: pointData.isStartBase,
+      label: pointData.label,
     };
   };
 
@@ -264,9 +273,10 @@ export class SolverScreenBLoC {
 
   @computed
   get coords(): [number, number][] {
-    // const allPoints = [...this.points, ...this.bases];
     const allPoints = this.route;
-    return allPoints.map(({ lng, lat }) => [lng, lat]);
+    const res = allPoints.map(({ lng, lat }): [number, number] => [lng, lat]);
+    console.log({ res });
+    return res;
   }
 
   @computed

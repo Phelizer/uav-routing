@@ -18,7 +18,7 @@ export interface Square {
 
 const createGenerateRandomPoint =
   (pointType: 'StartBase' | 'RegularBase' | 'RegularPoint') =>
-  (square: Square): Point => {
+  (square: Square, pointNumber: number): Point => {
     const minimumLat = Math.min(
       square.leftTopPoint.lat,
       square.rightBottomPoint.lat,
@@ -44,6 +44,11 @@ const createGenerateRandomPoint =
       lng: randomRealNumber(minimumLng, maximumLng),
       isBase: pointType !== 'RegularPoint',
       isStartBase: pointType === 'StartBase',
+      label: `${
+        pointType === 'StartBase' || pointType === 'RegularBase'
+          ? 'Base'
+          : 'Point'
+      } ${pointNumber}`,
     };
   };
 
@@ -73,11 +78,11 @@ export function generateProblem(
   const millisecInMin = 60000;
   const pointsToObserve: Point[] = [];
   for (let i = 0; i < numOfPoints; i++) {
-    pointsToObserve.push(generateRandomPoint(square));
+    pointsToObserve.push(generateRandomPoint(square, i + 1));
   }
 
-  const startBase = generateRandomStartBase(square);
-  const anotherBase = generateRandomRegularBase(square);
+  const startBase = generateRandomStartBase(square, 1);
+  const anotherBase = generateRandomRegularBase(square, 2);
   const speed = 70;
   const maxFlightTime = getSafeMaxFlightTime(square, speed);
   const changeTime = 5 * millisecInMin;

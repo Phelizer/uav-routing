@@ -6,6 +6,7 @@ export interface Point {
   lng: Degrees;
   isBase: boolean;
   isStartBase: boolean;
+  label: string;
 }
 
 export type Coords = Pick<Point, 'lat' | 'lng'>;

@@ -1,10 +1,11 @@
-import { isBoolean, isNumber, isRecord } from "./utils/utils";
+import { isBoolean, isNumber, isRecord, isString } from "./utils/utils";
 
 export interface Point {
   lat: number;
   lng: number;
   isBase: boolean;
   isStartBase: boolean;
+  label: string;
 }
 
 export function isPoint(value: unknown): value is Point {
@@ -15,7 +16,9 @@ export function isPoint(value: unknown): value is Point {
     "lng" in value &&
     isNumber(value.lng) &&
     "isBase" in value &&
-    isBoolean(value.isBase)
+    isBoolean(value.isBase) &&
+    "label" in value &&
+    isString(value.label)
   );
 }
 
