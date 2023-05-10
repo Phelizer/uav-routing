@@ -1,4 +1,3 @@
-// withRoleProtection.tsx
 import React, { ComponentType, FC } from "react";
 import { Navigate } from "react-router-dom";
 import { appStateStoreInstance } from "./stores/app-state.store";
