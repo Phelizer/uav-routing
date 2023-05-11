@@ -245,6 +245,8 @@ function getValidChanges_EXPERIMENTAL(
   valid: (route: Point[]) => boolean,
   bases: Point[],
 ) {
+  // TODO: now only first several points are serached, beacuse of the cap of 15
+  // need to make it no simply go throug, but randomly go throuhg
   const cap = 15;
   const newSols: Point[][] = [];
   for (const [i, point] of route.entries()) {
@@ -331,6 +333,8 @@ function getDescendants(
   return newSols;
 }
 
+// TODO: now only first several points are serached, beacuse of the cap of 15
+// need to make it no simply go throug, but randomly go throuhg
 function getDescendants_EXPERIMENTAL(
   route1: Point[],
   route2: Point[],
