@@ -44,7 +44,7 @@ export const createTabuSolver: CreateTabuSolver =
     anotherBase: Point,
     chargeTime: Milliseconds,
     maxFlightTime: Milliseconds,
-    speed: Milliseconds,
+    speed: KilometersPeHour,
   ) => {
     const { maxIterationsWithoutImprovement, numOfRuns, tabuTenure } = params;
     const bases = [startBase, anotherBase];

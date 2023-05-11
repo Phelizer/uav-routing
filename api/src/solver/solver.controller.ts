@@ -16,7 +16,6 @@ export class SolverController {
     return this.solverService.calculateRoute(body);
   }
 
-  // TODO: change role to Researcher
   @Roles(Role.Researcher)
   @UseGuards(JwtAuthGuard)
   @Post('experiment')
