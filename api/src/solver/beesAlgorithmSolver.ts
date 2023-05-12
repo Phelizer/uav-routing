@@ -1,13 +1,14 @@
 import { calculateDistance } from './calculateDistance';
-import { buildValidRoute } from './initValidSolution';
-import { KilometersPeHour, Milliseconds, Point } from './models';
 import {
   changeBase,
   createCalculateTimeFitness,
   ejectBase,
+  getKNearestPoints,
   isValidRoute,
   swap,
-} from './tabuSolver';
+} from './common';
+import { buildValidRoute } from './initValidSolution';
+import { KilometersPeHour, Milliseconds, Point } from './models';
 
 const partOfNearestPoints = 0.25;
 
@@ -87,7 +88,7 @@ export const createBeesAlgorithmSolver =
         //   allBases,
         // );
 
-        const nearestSols = getValidChanges_EXPERIMENTAL(
+        const nearestSols = getPossiblePermutations(
           perspectiveSol,
           nearestPointsMapping,
           valid,
@@ -118,11 +119,7 @@ export const createBeesAlgorithmSolver =
       const descendants: Point[][] = [];
       for (const [route1, route2] of pairedSols) {
         // const newDescendants = getDescendants(route1, route2, valid);
-        const newDescendants = getDescendants_EXPERIMENTAL(
-          route1,
-          route2,
-          valid,
-        );
+        const newDescendants = getDescendants(route1, route2, valid);
 
         descendants.push(...newDescendants);
       }
@@ -177,69 +174,7 @@ function rand(minimum: number, maximum: number) {
   return Math.floor(Math.random() * (maximum - minimum)) + minimum;
 }
 
-export function getKNearestPoints(point: Point, allPoints: Point[], k: number) {
-  const numOfPoints = Math.ceil(allPoints.length * k);
-  const distancesWithIndexes = allPoints
-    .map((p, i) => {
-      if (p === point) return null;
-      return { distance: calculateDistance(point, p), i };
-    })
-    .filter((v): v is Exclude<typeof v, null> => v !== null);
-
-  const ascendingSorted = distancesWithIndexes.sort(
-    (a, b) => a.distance - b.distance,
-  );
-
-  const nearestIndexes = ascendingSorted
-    .slice(0, numOfPoints)
-    .map(({ i }) => i);
-  // const nearestIndexes = distancesWithIndexes
-  //   .slice(0, numOfPoints)
-  //   .map(({ i }) => i);
-
-  return allPoints.filter((_, i) => nearestIndexes.includes(i));
-}
-
-export function getValidChanges(
-  route: Point[],
-  nearestPointsMapping: Map<Point, Point[]>,
-  valid: (route: Point[]) => boolean,
-  bases: Point[],
-) {
-  const newSols: Point[][] = [];
-  for (const [i, point] of route.entries()) {
-    const nearest = nearestPointsMapping.get(point) ?? [];
-    // swaps
-    for (const nearPoint of nearest) {
-      if (!nearPoint.isBase) {
-        const indexOfNearest = route.findIndex((p) => p === nearPoint);
-        const newSol = swap(route, i, indexOfNearest);
-        if (valid(newSol)) {
-          newSols.push(newSol);
-        }
-      }
-    }
-
-    if (point.isBase) {
-      // base removal
-      const newRemovalSol = ejectBase(route, point);
-      if (valid(newRemovalSol)) {
-        newSols.push(newRemovalSol);
-      }
-
-      // base change
-      const newBase = bases.find((b) => b !== point) as Point;
-      const newChangeSol = changeBase(route, i, newBase);
-      if (valid(newChangeSol)) {
-        newSols.push(newChangeSol);
-      }
-    }
-  }
-
-  return newSols;
-}
-
-function getValidChanges_EXPERIMENTAL(
+function getPossiblePermutations(
   route: Point[],
   nearestPointsMapping: Map<Point, Point[]>,
   valid: (route: Point[]) => boolean,
@@ -295,47 +230,47 @@ function getValidChanges_EXPERIMENTAL(
   return newSols;
 }
 
-function getDescendants(
-  route1: Point[],
-  route2: Point[],
-  valid: (route: Point[]) => boolean,
-) {
-  const newSols: Point[][] = [];
-  for (const [point1IndexAtFirstRoute, point1] of route1.entries()) {
-    for (const [point2IndexAtSecondRoute, point2] of route2.entries()) {
-      if (!point1.isBase && !point2.isBase) {
-        const point1IndexAtSecondRoute = route2.findIndex((p) => p === point1);
-        const point2IndexAtFirstRoute = route1.findIndex((p) => p === point2);
+// function getDescendants(
+//   route1: Point[],
+//   route2: Point[],
+//   valid: (route: Point[]) => boolean,
+// ) {
+//   const newSols: Point[][] = [];
+//   for (const [point1IndexAtFirstRoute, point1] of route1.entries()) {
+//     for (const [point2IndexAtSecondRoute, point2] of route2.entries()) {
+//       if (!point1.isBase && !point2.isBase) {
+//         const point1IndexAtSecondRoute = route2.findIndex((p) => p === point1);
+//         const point2IndexAtFirstRoute = route1.findIndex((p) => p === point2);
 
-        const firstDescendant = swap(
-          route1,
-          point1IndexAtFirstRoute,
-          point2IndexAtFirstRoute,
-        );
+//         const firstDescendant = swap(
+//           route1,
+//           point1IndexAtFirstRoute,
+//           point2IndexAtFirstRoute,
+//         );
 
-        const secondDescendant = swap(
-          route2,
-          point1IndexAtSecondRoute,
-          point2IndexAtSecondRoute,
-        );
+//         const secondDescendant = swap(
+//           route2,
+//           point1IndexAtSecondRoute,
+//           point2IndexAtSecondRoute,
+//         );
 
-        if (valid(firstDescendant)) {
-          newSols.push(firstDescendant);
-        }
+//         if (valid(firstDescendant)) {
+//           newSols.push(firstDescendant);
+//         }
 
-        if (valid(secondDescendant)) {
-          newSols.push(secondDescendant);
-        }
-      }
-    }
-  }
+//         if (valid(secondDescendant)) {
+//           newSols.push(secondDescendant);
+//         }
+//       }
+//     }
+//   }
 
-  return newSols;
-}
+//   return newSols;
+// }
 
 // TODO: now only first several points are serached, beacuse of the cap of 15
 // need to make it no simply go throug, but randomly go throuhg
-function getDescendants_EXPERIMENTAL(
+function getDescendants(
   route1: Point[],
   route2: Point[],
   valid: (route: Point[]) => boolean,

@@ -13,7 +13,6 @@ import * as fs from 'fs-extra';
 import {
   TabuParams,
   createCalculateStopsFitness,
-  createCalculateTimeFitness,
   createTabuSolver,
 } from './tabuSolver';
 import { AntColonyParams, createAntColonySolver } from './antColonySolver';
@@ -23,6 +22,7 @@ import {
 } from './beesAlgorithmSolver';
 import { Square, generateProblem } from './generateRandomPoint';
 import { buildGreedyRoute, buildValidRoute } from './initValidSolution';
+import { createCalculateTimeFitness } from './common';
 
 @Injectable()
 export class SolverService {

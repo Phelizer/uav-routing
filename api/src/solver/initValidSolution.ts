@@ -1,12 +1,14 @@
 import { randomInt } from 'src/utils';
 import { calculateTimeBetweenTwoPoints } from './calculateDistance';
 import { KilometersPeHour, Milliseconds, Point, Solver } from './models';
-import { createCalculateTimeFitness } from './tabuSolver';
+import { createCalculateTimeFitness } from './common';
 
+// not described yet
 function routeEndsInBase(bases: Point[], route: Point[]) {
   const lastPoint = route[route.length - 1];
   return bases.some((base) => lastPoint === base);
 }
+// end of not described block
 
 export const buildValidRoute: Solver = (
   pointsToObserve: Point[],
@@ -47,6 +49,7 @@ export const buildValidRoute: Solver = (
   return { route, fitness };
 };
 
+// not described yet
 function findNearestBase(
   availableBases: Point[],
   currentPoint: Point,
@@ -68,6 +71,7 @@ function findNearestBase(
     return currentValue < minValue ? currentBase : nearestBase;
   });
 }
+// end of not described block
 
 export function findAvailablePoint(
   currentPoint: Point,
@@ -176,6 +180,7 @@ export function isAvailableBase(
   return false;
 }
 
+// not described yet
 // TODO: rewrite
 function calculateProbabilities(numbers: number[]): number[] {
   const sum = numbers.reduce((acc, num) => acc + num, 0);
@@ -183,6 +188,7 @@ function calculateProbabilities(numbers: number[]): number[] {
 
   return probabilities;
 }
+// end of not described block
 
 // TODO: rewrite
 export function determineOutcome(probabilities: number[]): number {
@@ -202,6 +208,8 @@ export function determineOutcome(probabilities: number[]): number {
 
 // greedy algorithm
 
+// TODO: remove
+// NOT TO DOC
 export const buildGreedyRoute: Solver = (
   pointsToObserve: Point[],
   startBase: Point,
@@ -241,7 +249,7 @@ export const buildGreedyRoute: Solver = (
   return { route, fitness };
 };
 
-export function findNearestAvailablePoint(
+function findNearestAvailablePoint(
   currentPoint: Point,
   unvisitedPoints: Point[],
   bases: Point[],

@@ -1,5 +1,11 @@
-import { getKNearestPoints, getValidChanges } from './beesAlgorithmSolver';
-import { calculateTimeBetweenTwoPoints } from './calculateDistance';
+import {
+  changeBase,
+  createCalculateTimeFitness,
+  ejectBase,
+  getKNearestPoints,
+  isValidRoute,
+  swap,
+} from './common';
 import { buildValidRoute } from './initValidSolution';
 import {
   KilometersPeHour,
@@ -133,161 +139,113 @@ export const createTabuSolver: CreateTabuSolver =
     return bestSolutionEver;
   };
 
-function generateNeighbors(
-  isValid: (route: Point[]) => boolean,
-  source: Point[],
-  bases: Point[],
-) {
-  const swapNeighbors = generateSwapNeighbors(isValid, source);
-  const baseChangeIndexes = getAvailableBaseChanges(isValid, source, bases);
-  const baseChangeNeighbors: Point[][] = [];
-  for (const availableBaseIndex of baseChangeIndexes) {
-    const baseToChange = source[availableBaseIndex];
-    const anotherBase = getOppositeBase(bases, baseToChange);
-    baseChangeNeighbors.push(
-      changeBase(source, availableBaseIndex, anotherBase),
-    );
-  }
+// function generateNeighbors(
+//   isValid: (route: Point[]) => boolean,
+//   source: Point[],
+//   bases: Point[],
+// ) {
+//   const swapNeighbors = generateSwapNeighbors(isValid, source);
+//   const baseChangeIndexes = getAvailableBaseChanges(isValid, source, bases);
+//   const baseChangeNeighbors: Point[][] = [];
+//   for (const availableBaseIndex of baseChangeIndexes) {
+//     const baseToChange = source[availableBaseIndex];
+//     const anotherBase = getOppositeBase(bases, baseToChange);
+//     baseChangeNeighbors.push(
+//       changeBase(source, availableBaseIndex, anotherBase),
+//     );
+//   }
 
-  const ejectBaseNeighbors = generateEjectBaseNeighbors(isValid, source, bases);
+//   const ejectBaseNeighbors = generateEjectBaseNeighbors(isValid, source, bases);
 
-  return [...swapNeighbors, ...baseChangeNeighbors, ...ejectBaseNeighbors];
-}
+//   return [...swapNeighbors, ...baseChangeNeighbors, ...ejectBaseNeighbors];
+// }
 
-function generateEjectBaseNeighbors(
-  isValid: (route: Point[]) => boolean,
-  source: Point[],
-  bases: Point[],
-) {
-  const neighbors: Point[][] = [];
-  for (const point of source) {
-    if (isBase(bases, point)) {
-      const routeWithEjectedBase = ejectBase(source, point);
-      if (isValid(routeWithEjectedBase)) {
-        neighbors.push(routeWithEjectedBase);
-      }
-    }
-  }
+// function generateEjectBaseNeighbors(
+//   isValid: (route: Point[]) => boolean,
+//   source: Point[],
+//   bases: Point[],
+// ) {
+//   const neighbors: Point[][] = [];
+//   for (const point of source) {
+//     if (isBase(bases, point)) {
+//       const routeWithEjectedBase = ejectBase(source, point);
+//       if (isValid(routeWithEjectedBase)) {
+//         neighbors.push(routeWithEjectedBase);
+//       }
+//     }
+//   }
 
-  return neighbors;
-}
+//   return neighbors;
+// }
 
-export function ejectBase(route: Point[], baseToEject: Point) {
-  return route.filter((point) => point !== baseToEject);
-}
+// function generateSwapNeighbors(
+//   isValid: (route: Point[]) => boolean,
+//   source: Point[],
+// ) {
+//   const neighbors: Point[][] = [];
+//   // this can be extracted, calculated one time and reused to avoid
+//   // unnecessary recalculations. Or can make this function memoizable
 
-function generateSwapNeighbors(
-  isValid: (route: Point[]) => boolean,
-  source: Point[],
-) {
-  const neighbors: Point[][] = [];
-  // this can be extracted, calculated one time and reused to avoid
-  // unnecessary recalculations. Or can make this function memoizable
+//   for (let i = 0; i < source.length; i++) {
+//     const availablePartnerIndexes = getAvailableSwapPartnerIndexes(
+//       isValid,
+//       source,
+//       i,
+//     );
 
-  for (let i = 0; i < source.length; i++) {
-    const availablePartnerIndexes = getAvailableSwapPartnerIndexes(
-      isValid,
-      source,
-      i,
-    );
+//     for (const partI of availablePartnerIndexes) {
+//       neighbors.push(swap(source, i, partI));
+//     }
+//   }
 
-    for (const partI of availablePartnerIndexes) {
-      neighbors.push(swap(source, i, partI));
-    }
-  }
+//   return neighbors;
+// }
 
-  return neighbors;
-}
+// function getAvailableSwapPartnerIndexes(
+//   isValid: (route: Point[]) => boolean,
+//   route: Point[],
+//   indexOfPointToSwap: number,
+// ) {
+//   const availablePartnersIndexes: number[] = [];
+//   for (let partnerIndex = 0; partnerIndex < route.length; partnerIndex++) {
+//     const isSelf = partnerIndex === indexOfPointToSwap;
+//     const isValidNeighbor = isValid(
+//       swap(route, indexOfPointToSwap, partnerIndex),
+//     );
 
-function getAvailableSwapPartnerIndexes(
-  isValid: (route: Point[]) => boolean,
-  route: Point[],
-  indexOfPointToSwap: number,
-) {
-  const availablePartnersIndexes: number[] = [];
-  for (let partnerIndex = 0; partnerIndex < route.length; partnerIndex++) {
-    const isSelf = partnerIndex === indexOfPointToSwap;
-    const isValidNeighbor = isValid(
-      swap(route, indexOfPointToSwap, partnerIndex),
-    );
+//     if (isValidNeighbor && !isSelf) {
+//       availablePartnersIndexes.push(partnerIndex);
+//     }
+//   }
 
-    if (isValidNeighbor && !isSelf) {
-      availablePartnersIndexes.push(partnerIndex);
-    }
-  }
-
-  return availablePartnersIndexes;
-}
+//   return availablePartnersIndexes;
+// }
 
 function isBase(bases: Point[], point: Point) {
   return bases.includes(point);
 }
 
-function getAvailableBaseChanges(
-  isValid: (route: Point[]) => boolean,
-  route: Point[],
-  bases: Point[],
-) {
-  const availableBaseChanges: number[] = [];
-  for (const [i, elem] of route.entries()) {
-    if (isBase(bases, elem)) {
-      const anotherBase = getOppositeBase(bases, elem);
-      if (isValid(changeBase(route, i, anotherBase))) {
-        availableBaseChanges.push(i);
-      }
-    }
-  }
+// function getAvailableBaseChanges(
+//   isValid: (route: Point[]) => boolean,
+//   route: Point[],
+//   bases: Point[],
+// ) {
+//   const availableBaseChanges: number[] = [];
+//   for (const [i, elem] of route.entries()) {
+//     if (isBase(bases, elem)) {
+//       const anotherBase = getOppositeBase(bases, elem);
+//       if (isValid(changeBase(route, i, anotherBase))) {
+//         availableBaseChanges.push(i);
+//       }
+//     }
+//   }
 
-  return availableBaseChanges;
-}
+//   return availableBaseChanges;
+// }
 
-function getOppositeBase(bases: Point[], baseToChange: Point) {
-  return bases.find((base) => base !== baseToChange) as Point;
-}
-
-export function changeBase(
-  route: Point[],
-  indexOfBaseToChange: number,
-  replacement: Point,
-) {
-  const routeCopy = [...route];
-  routeCopy[indexOfBaseToChange] = replacement;
-  return routeCopy;
-}
-
-export function swap(route: Point[], i: number, j: number): Point[] {
-  const newArray = route.slice();
-  [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
-
-  return newArray;
-}
-
-export const createCalculateTimeFitness =
-  (
-    speed: KilometersPeHour,
-    maxFlightTime: Milliseconds,
-    chargeTime: Milliseconds,
-  ) =>
-  (route: Point[]) => {
-    let totalTime = 0;
-    let time = 0;
-
-    for (let i = 0; i < route.length - 1; i++) {
-      const from = route[i];
-      const to = route[i + 1];
-      const timeToNext = calculateTimeBetweenTwoPoints(from, to, speed);
-
-      if (time + timeToNext > maxFlightTime) {
-        totalTime += time + chargeTime;
-        time = 0;
-      } else {
-        time += timeToNext;
-      }
-    }
-
-    totalTime += time;
-    return totalTime;
-  };
+// function getOppositeBase(bases: Point[], baseToChange: Point) {
+//   return bases.find((base) => base !== baseToChange) as Point;
+// }
 
 export const createCalculateStopsFitness =
   (bases: Point[]) => (route: Point[]) => {
@@ -300,55 +258,41 @@ export const createCalculateStopsFitness =
       );
   };
 
-// utility:
-
-const createTimeFunc =
-  (speed: Milliseconds) => (point1: Point, point2: Point) =>
-    calculateTimeBetweenTwoPoints(point1, point2, speed);
-
-function routeIncludesAllPointsToObserve(
+export function getValidChanges(
   route: Point[],
-  pointsToObserve: Point[],
+  nearestPointsMapping: Map<Point, Point[]>,
+  valid: (route: Point[]) => boolean,
+  bases: Point[],
 ) {
-  return pointsToObserve.every((point) => route.includes(point));
-}
-
-function routeStartsAndEndsInBases(route: Point[]): boolean {
-  const startsWithBase = route[0].isBase;
-  const endsWithBase = route[route.length - 1].isBase;
-
-  return startsWithBase && endsWithBase;
-}
-
-function routeStartsAtStartBase(route: Point[]): boolean {
-  return route[0].isStartBase;
-}
-
-export function isValidRoute(
-  route: Point[],
-  maxFlightTime: Milliseconds,
-  speed: KilometersPeHour,
-  pointsToObserve: Point[],
-): boolean {
-  const time = createTimeFunc(speed);
-  let currentFlightTime = 0;
-  for (let i = 1; i < route.length; i++) {
-    currentFlightTime += time(route[i - 1], route[i]);
-    if (route[i].isBase) {
-      if (currentFlightTime > maxFlightTime) {
-        return false;
+  const newSols: Point[][] = [];
+  for (const [i, point] of route.entries()) {
+    const nearest = nearestPointsMapping.get(point) ?? [];
+    // swaps
+    for (const nearPoint of nearest) {
+      if (!nearPoint.isBase) {
+        const indexOfNearest = route.findIndex((p) => p === nearPoint);
+        const newSol = swap(route, i, indexOfNearest);
+        if (valid(newSol)) {
+          newSols.push(newSol);
+        }
       }
-      currentFlightTime = 0;
+    }
+
+    if (point.isBase) {
+      // base removal
+      const newRemovalSol = ejectBase(route, point);
+      if (valid(newRemovalSol)) {
+        newSols.push(newRemovalSol);
+      }
+
+      // base change
+      const newBase = bases.find((b) => b !== point) as Point;
+      const newChangeSol = changeBase(route, i, newBase);
+      if (valid(newChangeSol)) {
+        newSols.push(newChangeSol);
+      }
     }
   }
 
-  const inspectsAllPoints = routeIncludesAllPointsToObserve(
-    route,
-    pointsToObserve,
-  );
-
-  const startsAndEndsInBases = routeStartsAndEndsInBases(route);
-  const startsAtStartBase = routeStartsAtStartBase(route);
-
-  return inspectsAllPoints && startsAndEndsInBases && startsAtStartBase;
+  return newSols;
 }

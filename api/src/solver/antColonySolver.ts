@@ -1,11 +1,11 @@
 import { calculateTimeBetweenTwoPoints } from './calculateDistance';
+import { createCalculateTimeFitness, isValidRoute } from './common';
 import {
   determineOutcome,
   isAvailableBase,
   isAvailablePoint,
 } from './initValidSolution';
 import { KilometersPeHour, Milliseconds, Point, Solver } from './models';
-import { createCalculateTimeFitness, isValidRoute } from './tabuSolver';
 
 export interface AntColonyParams {
   antsNumber: number;
@@ -64,13 +64,12 @@ export const createAntColonySolver: CreateAntColonySolver =
     const timeToNext = (p1: Point, p2: Point) =>
       calculateTimeBetweenTwoPoints(p1, p2, speed);
 
-    const capculateProbability_experimental =
-      createCalculateProbability_EXPERIMANTAL(
-        pheromoneState,
-        pheromoneImportance,
-        heurInfoImportance,
-        timeToNext,
-      );
+    const capculateProbability_experimental = createCalculateProbability(
+      pheromoneState,
+      pheromoneImportance,
+      heurInfoImportance,
+      timeToNext,
+    );
 
     const antsSolutions: Point[][] = [];
 
@@ -165,6 +164,7 @@ function normProbs(probabilities: number[]) {
   return probabilities.map((p) => p / sumOfProbs);
 }
 
+// OLD VERSION:
 // const createCalculateProbability =
 //   (
 //     pherState: PheromoneState,
@@ -182,7 +182,7 @@ function normProbs(probabilities: number[]) {
 //     );
 //   };
 
-const createCalculateProbability_EXPERIMANTAL =
+const createCalculateProbability =
   (
     pherState: PheromoneState,
     pheromoneImportance: number,
