@@ -14,19 +14,6 @@ class AppStateStore {
   constructor() {
     makeObservable(this);
   }
-
-  @action
-  setAccessToken(token: string) {
-    Cookies.set(CookieKeys.accessToken, token);
-    this.isLoggedIn = true;
-  }
-
-  @action
-  logout = () => {
-    Cookies.remove(CookieKeys.accessToken);
-    this.isLoggedIn = false;
-    this.roles = [];
-  };
 }
 
 export const appStateStoreInstance = new AppStateStore();
