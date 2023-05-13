@@ -19,6 +19,7 @@ export const LoginScreen = observer(() => {
           label="password"
           value={bloc.formData.password}
           onChange={bloc.setPassword}
+          type="password"
         />
 
         <button type="submit">Log in</button>

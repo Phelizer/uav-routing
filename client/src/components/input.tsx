@@ -6,6 +6,7 @@ interface InputProps {
   error?: string;
   className?: string;
   onChange: (value: string) => void;
+  type?: string;
 }
 
 export function Input({
@@ -14,6 +15,7 @@ export function Input({
   error,
   onChange,
   className,
+  type = "text",
 }: InputProps) {
   const onChangeHandler = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -25,7 +27,7 @@ export function Input({
   return (
     <div className={className}>
       <div>{label}</div>
-      <input type="text" value={value} onChange={onChangeHandler}></input>
+      <input type={type} value={value} onChange={onChangeHandler}></input>
       {!!error && <div>{error}</div>}
     </div>
   );
