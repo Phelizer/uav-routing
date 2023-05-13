@@ -1,6 +1,5 @@
-// @ts-ignore
 import Cookies from "js-cookie";
-import { action, makeObservable, observable } from "mobx";
+import { makeObservable, observable } from "mobx";
 import { CookieKeys } from "../utils/consts";
 import { Role } from "../models";
 
