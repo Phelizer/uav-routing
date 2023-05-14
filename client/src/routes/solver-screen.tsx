@@ -1,12 +1,30 @@
 import { observer } from "mobx-react-lite";
 import { Input } from "../components/input";
 import { SolverScreenBLoC } from "./solver-screen.bloc";
-import { Fragment, useEffect, useMemo, useRef, useState } from "react";
+import {
+  ChangeEvent,
+  ChangeEventHandler,
+  Fragment,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import "./solver-screen.css";
 import * as d3 from "d3";
 
 export const SolverScreen = observer(() => {
   const bloc = useMemo(() => new SolverScreenBLoC(), []);
+
+  const fileHandler = useCallback(
+    (event: ChangeEvent<HTMLInputElement>) => {
+      if (event.target.files?.[0]) {
+        bloc.setInputFromFile(event.target.files?.[0]);
+      }
+    },
+    [bloc]
+  );
 
   return (
     <div>
@@ -36,14 +54,12 @@ export const SolverScreen = observer(() => {
           </div>
         </Fragment>
       ))}
-
       <button
         className="withLeftMargin withBottomMargin"
         onClick={bloc.addPoint}
       >
         Add point
       </button>
-
       <div className="withLeftMargin">Start base:</div>
       <div className="row withLeftMargin withBottomMargin">
         <Input
@@ -62,7 +78,6 @@ export const SolverScreen = observer(() => {
 
         <div>Label: Base 1</div>
       </div>
-
       <div className="withLeftMargin">Another base:</div>
       <div className="row withLeftMargin withBottomMargin">
         <Input
@@ -81,7 +96,6 @@ export const SolverScreen = observer(() => {
 
         <div>Label: Base 2</div>
       </div>
-
       <div className="row withLeftMargin withBottomMargin">
         <Input
           className="withRightMargin"
@@ -103,10 +117,14 @@ export const SolverScreen = observer(() => {
         />
       </div>
 
+      <input className="withLeftMargin" type="file" onChange={fileHandler} />
+      <div className="errorMsg withLeftMargin withBottomMargin">
+        {bloc.fileErrorMsg}
+      </div>
+
       <button className="withLeftMargin" onClick={bloc.submitForm}>
         Submit
       </button>
-
       {!!bloc.stringifiedResult && (
         <>
           <div className="withLeftMargin withTopMargin">RESULT:</div>
@@ -115,7 +133,6 @@ export const SolverScreen = observer(() => {
           </div>
         </>
       )}
-
       {bloc.arrows.length !== 0 && bloc.coords.length !== 0 && (
         <div className="canvContainer">
           <PointComponent

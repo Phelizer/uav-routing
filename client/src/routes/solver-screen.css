@@ -39,3 +39,8 @@
     margin-right: 5vw;
     margin-bottom: 5vw;
 }
+
+.errorMsg {
+    color: red;
+    font-size: small;
+}

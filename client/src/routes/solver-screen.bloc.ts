@@ -1,4 +1,10 @@
-import { action, computed, makeObservable, observable } from "mobx";
+import {
+  action,
+  computed,
+  makeObservable,
+  observable,
+  runInAction,
+} from "mobx";
 import { Point } from "../models";
 import { SolverService } from "../services/solver.service";
 import { solutionsStoreInstance } from "../stores/solutions.store";
@@ -42,6 +48,20 @@ export class SolverScreenBLoC {
   };
 
   private solverService = new SolverService();
+
+  @observable
+  fileErrorMsg = "";
+
+  @action
+  private setError = () => {
+    this.fileErrorMsg =
+      "Wrong file data. File should contain a valid json of specified format";
+  };
+
+  @action
+  private clearError() {
+    this.fileErrorMsg = "";
+  }
 
   @computed
   get route() {
@@ -315,4 +335,36 @@ export class SolverScreenBLoC {
   get yOffsetInCoordinates() {
     return this.yDiff * this.offset;
   }
+
+  private pointToFormDataPoint = (
+    point: Omit<PointData, keyof Coords> & { lat: number; lng: number }
+  ): PointData => {
+    return { ...point, lat: point.lat.toString(), lng: point.lng.toString() };
+  };
+
+  // not described yet
+  // TODO: describe
+  setInputFromFile = async (file: File) => {
+    try {
+      const json = JSON.parse(await file.text());
+      console.log({ json });
+      const points = json.points.map(this.pointToFormDataPoint);
+      const startBase = this.pointToFormDataPoint(json.startBase);
+      const anotherBase = this.pointToFormDataPoint(json.anotherBase);
+      runInAction(() => {
+        this.formData = {
+          points,
+          startBase,
+          anotherBase,
+          chargeTime: json.chargeTime.toString(),
+          maxFlightTime: json.maxFlightTime.toString(),
+          speed: json.speed.toString(),
+        };
+      });
+
+      this.clearError();
+    } catch (e) {
+      this.setError();
+    }
+  };
 }
