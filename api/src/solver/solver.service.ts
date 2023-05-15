@@ -60,9 +60,6 @@ export class SolverService {
   }
 
   private solver: Solver = this.getBeesAlgorithmSolver();
-  setSolver = (algorithmName: AlgorithmName) => {
-    this.solver = this.algorithmNameMapping[algorithmName];
-  };
 
   private readonly algorithmNameMapping: Record<AlgorithmName, Solver> = {
     ants: this.getAntColonySolver(),
@@ -143,12 +140,12 @@ export class SolverService {
     numberOfRuns,
   }: PerformExperimentInputData) {
     console.log('here');
-    this.setSolver(algorithm);
+    const solver = this.algorithmNameMapping[algorithm];
     const results: Result[] = [];
     for (let i = 0; i < numberOfRuns; i++) {
       console.log('iter', i);
       const problem = generateProblem(this.standardSquare, numberOfPoints);
-      results.push(this.solver(...problem));
+      results.push(solver(...problem));
 
       const { fitness: randomFitness } = buildValidRoute(...problem);
       const { fitness: greedyFitness } = buildGreedyRoute(...problem);
