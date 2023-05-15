@@ -289,7 +289,6 @@ export class SolverScreenBLoC {
   get coords(): [number, number][] {
     const allPoints = this.route;
     const res = allPoints.map(({ lng, lat }): [number, number] => [lng, lat]);
-    console.log({ res });
     return res;
   }
 
@@ -353,7 +352,6 @@ export class SolverScreenBLoC {
   setInputFromFile = async (file: File) => {
     try {
       const json = JSON.parse(await file.text());
-      console.log({ json });
       const points = json.points.map(this.pointToFormDataPoint);
       const startBase = this.pointToFormDataPoint(json.startBase);
       const anotherBase = this.pointToFormDataPoint(json.anotherBase);
