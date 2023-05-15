@@ -6,7 +6,8 @@ import { CookieKeys } from "../utils/consts";
 export async function fetchAPI<Result>(
   url: string,
   typeGuard: (value: unknown) => value is Result,
-  options?: RequestInit
+  options?: RequestInit,
+  returnAsBlob = false
 ) {
   const response = await fetch(url, options);
   if (response.status === 401) {
@@ -17,6 +18,10 @@ export async function fetchAPI<Result>(
 
   if (!response.ok) {
     throw new SomethingWrongError(response.status);
+  }
+
+  if (returnAsBlob) {
+    return (await response.blob()) as Result;
   }
 
   const json = await response.json();

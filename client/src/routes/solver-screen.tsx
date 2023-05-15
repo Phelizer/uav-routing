@@ -122,6 +122,16 @@ export const SolverScreen = observer(() => {
         {bloc.fileErrorMsg}
       </div>
 
+      <button className="withLeftMargin" onClick={bloc.downloadLastResult}>
+        Download last result
+      </button>
+
+      {bloc.triedToDownloadFileBeforeFirstSolution && (
+        <div className="errorMsg withLeftMargin withBottomMargin">
+          {bloc.EARLY_FILE_DOWNLOAD_ERROR_TEXT}
+        </div>
+      )}
+
       <button className="withLeftMargin" onClick={bloc.submitForm}>
         Submit
       </button>

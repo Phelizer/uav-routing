@@ -8,6 +8,7 @@ import {
   performExperimentAPI,
   PerformExperimentData,
 } from "../api/solver/performExperimentAPI";
+import { downloadLastResultAPI } from "../api/solver/downloadLastResultAPI";
 
 export class SolverService {
   private solutionsStore = solutionsStoreInstance;
@@ -24,5 +25,9 @@ export class SolverService {
     runInAction(() => {
       this.solutionsStore.lastExperimentSolutions = result;
     });
+  }
+
+  async downloadLastResult() {
+    return await downloadLastResultAPI();
   }
 }

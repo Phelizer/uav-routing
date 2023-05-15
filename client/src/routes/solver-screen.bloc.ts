@@ -8,6 +8,7 @@ import {
 import { Point } from "../models";
 import { SolverService } from "../services/solver.service";
 import { solutionsStoreInstance } from "../stores/solutions.store";
+import { saveAs } from "file-saver";
 
 interface Coords {
   lat: string;
@@ -62,6 +63,11 @@ export class SolverScreenBLoC {
   private clearError() {
     this.fileErrorMsg = "";
   }
+
+  @observable
+  triedToDownloadFileBeforeFirstSolution = false;
+
+  readonly EARLY_FILE_DOWNLOAD_ERROR_TEXT = "You must solve a problem first";
 
   @computed
   get route() {
@@ -365,6 +371,24 @@ export class SolverScreenBLoC {
       this.clearError();
     } catch (e) {
       this.setError();
+    }
+  };
+
+  downloadLastResult = async () => {
+    try {
+      const blob = await this.solverService.downloadLastResult();
+      saveAs(blob, "result.json");
+
+      runInAction(() => {
+        this.triedToDownloadFileBeforeFirstSolution = false;
+      });
+    } catch (e: any) {
+      // TODO: bad code, refactor:
+      if (e?.message?.includes("403")) {
+        runInAction(() => {
+          this.triedToDownloadFileBeforeFirstSolution = true;
+        });
+      }
     }
   };
 }

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable, StreamableFile } from '@nestjs/common';
 import {
   AlgorithmName,
   CalculateRouteInputData,
@@ -7,6 +7,7 @@ import {
   PerformExperimentInputData,
   Point,
   Result,
+  Solution,
   Solver,
 } from './models';
 import * as fs from 'fs-extra';
@@ -23,6 +24,8 @@ import {
 import { Square, generateProblem } from './generateRandomPoint';
 import { buildGreedyRoute, buildValidRoute } from './initValidSolution';
 import { createCalculateTimeFitness } from './common';
+import { User } from 'src/users/users.service';
+import { join } from 'path';
 
 @Injectable()
 export class SolverService {
@@ -67,14 +70,19 @@ export class SolverService {
     tabu: this.getTabuSolver(),
   };
 
-  calculateRoute({
-    pointsToObserve,
-    startBase,
-    anotherBase,
-    chargeTime,
-    maxFlightTime,
-    speed,
-  }: CalculateRouteInputData): Result & Record<string, unknown> {
+  calculateRoute(
+    inputData: CalculateRouteInputData,
+    user: User,
+  ): Result & Record<string, unknown> {
+    const {
+      pointsToObserve,
+      startBase,
+      anotherBase,
+      chargeTime,
+      maxFlightTime,
+      speed,
+    } = inputData;
+
     const { points, bases }: { points: Point[]; bases: [Point, Point] } =
       JSON.parse(fs.readFileSync(__dirname + '/../../coords.json').toString());
     const shuffledPoints = this.randomlyReplaceArrayElements(points);
@@ -82,8 +90,8 @@ export class SolverService {
     const maxFlightTime2: Milliseconds = 120000;
     const speed2: KilometersPeHour = 30;
     const chargeTime2 = 60000;
-    console.time('tabu');
-    const { route, fitness } = this.solver(
+    console.time('algorithm time');
+    const solution = this.solver(
       shuffledPoints,
       startBase2,
       anotherBase2,
@@ -91,19 +99,12 @@ export class SolverService {
       maxFlightTime2,
       speed2,
     );
-    console.timeEnd('tabu');
-    const calcualteFitnessByStops = createCalculateStopsFitness(bases);
-    const calculateFitnessByTime = createCalculateTimeFitness(
-      speed2,
-      maxFlightTime2,
-      chargeTime2,
-    );
-    return {
-      route,
-      fitness,
-      stops: calcualteFitnessByStops(route),
-      totalTime: calculateFitnessByTime(route),
-    };
+
+    console.timeEnd('algorithm time');
+
+    this.lastSolutionByUsers.set(user.id, solution);
+
+    return solution;
 
     // const bases = [startBase, anotherBase];
     // const calcualteFitnessByStops = createCalculateStopsFitness(bases);
@@ -167,5 +168,28 @@ export class SolverService {
     }
 
     return newArray;
+  }
+
+  // TEMPORAR
+  // TODO: replace with db
+  private lastSolutionByUsers = new Map<string, Solution>();
+
+  async downloadLastResult(user: User) {
+    const path = join(process.cwd(), 'tmp', `${user.username}LastResult.json`);
+    const lastResult = this.lastSolutionByUsers.get(user.id);
+    if (!lastResult) {
+      return new NoLastSolutionYetError();
+    }
+
+    console.log({ lastResult });
+    await fs.outputFile(path, JSON.stringify(lastResult));
+    const file = fs.createReadStream(path);
+    return new StreamableFile(file);
+  }
+}
+
+export class NoLastSolutionYetError extends HttpException {
+  constructor() {
+    super('You need to solve your first problem first', 403);
   }
 }
