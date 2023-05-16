@@ -270,8 +270,6 @@ function getPossiblePermutations(
 //   return newSols;
 // }
 
-// TODO: now only first several points are serached, beacuse of the cap of 15
-// need to make it no simply go throug, but randomly go throuhg
 function getDescendants(
   route1: Point[],
   route2: Point[],
