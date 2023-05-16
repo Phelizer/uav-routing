@@ -135,14 +135,17 @@ export const SolverScreen = observer(() => {
       <button className="withLeftMargin" onClick={bloc.submitForm}>
         Submit
       </button>
-      {!!bloc.stringifiedResult && (
-        <>
-          <div className="withLeftMargin withTopMargin">RESULT:</div>
-          <div className="withLeftMargin withTopMargin withBottomMargin">
-            <b>{bloc.stringifiedResult}</b>
-          </div>
-        </>
+
+      {bloc.stringifiedSubroutes.length > 0 && (
+        <div className="withLeftMargin withTopMargin">RESULT:</div>
       )}
+
+      {bloc.stringifiedSubroutes.map((subrouteStr) => (
+        <div className="withLeftMargin withTopMargin withBottomMargin">
+          <b>{subrouteStr}</b>
+        </div>
+      ))}
+
       {bloc.arrows.length !== 0 && bloc.coords.length !== 0 && (
         <div className="canvContainer">
           <PointComponent

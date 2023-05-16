@@ -321,12 +321,39 @@ export class SolverScreenBLoC {
 
   private readonly SEPARATOR = " ➔ ";
 
-  @computed
-  get stringifiedResult() {
-    return this.route.reduce(
+  private stringifySubroute = (subroute: Point[]) => {
+    return subroute.reduce(
       (acc, { label }, i) => acc + (i !== 0 ? this.SEPARATOR : "") + label,
       ""
     );
+  };
+
+  @computed
+  private get subroutes() {
+    const subroutes: Point[][] = [];
+    if (this.route.length > 0) {
+      subroutes[0] = [this.route[0]];
+    }
+
+    let currentSubrouteIndex = 0;
+    for (let i = 1; i < this.route.length; i++) {
+      const currPoint = this.route[i];
+      if (!subroutes[currentSubrouteIndex]) {
+        subroutes[currentSubrouteIndex] = [];
+      }
+
+      subroutes[currentSubrouteIndex].push(currPoint);
+      if (currPoint.isBase) {
+        currentSubrouteIndex++;
+      }
+    }
+
+    return subroutes;
+  }
+
+  @computed
+  get stringifiedSubroutes() {
+    return this.subroutes.map(this.stringifySubroute);
   }
 
   readonly offset = 0.05;
