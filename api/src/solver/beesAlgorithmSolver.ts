@@ -1,3 +1,4 @@
+import { randomlyReplaceArrayElements } from 'src/utils';
 import { calculateDistance } from './calculateDistance';
 import {
   changeBase,
@@ -180,11 +181,12 @@ function getPossiblePermutations(
   valid: (route: Point[]) => boolean,
   bases: Point[],
 ) {
-  // TODO: now only first several points are serached, beacuse of the cap of 15
-  // need to make it no simply go throug, but randomly go throuhg
   const cap = 15;
   const newSols: Point[][] = [];
-  for (const [i, point] of route.entries()) {
+  const routeIndexes = route.map((_, i) => i);
+  const shuffledIndexes = randomlyReplaceArrayElements(routeIndexes);
+  for (const i of shuffledIndexes) {
+    const point = route[i];
     const nearest = nearestPointsMapping.get(point) ?? [];
     // swaps
     for (const nearPoint of nearest) {
@@ -277,8 +279,19 @@ function getDescendants(
 ) {
   const cap = 50;
   const newSols: Point[][] = [];
-  for (const [point1IndexAtFirstRoute, point1] of route1.entries()) {
-    for (const [point2IndexAtSecondRoute, point2] of route2.entries()) {
+  const indexesOfFirstRoute = route1.map((_, i) => i);
+  const indexesOfSecondRoute = route2.map((_, i) => i);
+
+  const shuffledIndexesOfFirstRoute =
+    randomlyReplaceArrayElements(indexesOfFirstRoute);
+
+  const shuffledIndexesOfSecondRoute =
+    randomlyReplaceArrayElements(indexesOfSecondRoute);
+
+  for (const point1IndexAtFirstRoute of shuffledIndexesOfFirstRoute) {
+    const point1 = route1[point1IndexAtFirstRoute];
+    for (const point2IndexAtSecondRoute of shuffledIndexesOfSecondRoute) {
+      const point2 = route2[point2IndexAtSecondRoute];
       if (!point1.isBase && !point2.isBase) {
         const point1IndexAtSecondRoute = route2.findIndex((p) => p === point1);
         const point2IndexAtFirstRoute = route1.findIndex((p) => p === point2);

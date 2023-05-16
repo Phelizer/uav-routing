@@ -26,6 +26,7 @@ import { buildGreedyRoute, buildValidRoute } from './initValidSolution';
 import { createCalculateTimeFitness } from './common';
 import { User } from 'src/users/users.service';
 import { join } from 'path';
+import { randomlyReplaceArrayElements } from 'src/utils';
 
 @Injectable()
 export class SolverService {
@@ -85,7 +86,7 @@ export class SolverService {
 
     const { points, bases }: { points: Point[]; bases: [Point, Point] } =
       JSON.parse(fs.readFileSync(__dirname + '/../../coords.json').toString());
-    const shuffledPoints = this.randomlyReplaceArrayElements(points);
+    const shuffledPoints = randomlyReplaceArrayElements(points);
     const [startBase2, anotherBase2] = bases;
     const maxFlightTime2: Milliseconds = 120000;
     const speed2: KilometersPeHour = 30;
@@ -155,19 +156,6 @@ export class SolverService {
     }
 
     return results;
-  }
-
-  private randomlyReplaceArrayElements<T>(array: T[]): T[] {
-    const newArray: T[] = [...array];
-
-    for (let i = 0; i < newArray.length; i++) {
-      const randomIndex = Math.floor(Math.random() * newArray.length);
-      const temp = newArray[i];
-      newArray[i] = newArray[randomIndex];
-      newArray[randomIndex] = temp;
-    }
-
-    return newArray;
   }
 
   // TEMPORAR
