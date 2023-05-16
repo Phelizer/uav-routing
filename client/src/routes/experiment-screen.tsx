@@ -48,6 +48,9 @@ const ExperimentScreen_ = observer(() => {
           </>
         ))}
 
+        <div className="withTopMargin">Best time:</div>
+        <div>{bloc.bestFitness}</div>
+
         <div className="withTopMargin">Mean time:</div>
         <div>{bloc.meanFitness}</div>
 

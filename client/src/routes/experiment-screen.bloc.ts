@@ -119,4 +119,9 @@ export class ExperimentScreenBLoC {
 
     return this.round(stDev);
   }
+
+  @computed
+  get bestFitness() {
+    return this.fitnesses.reduce((best, x) => (x < best ? x : best), Infinity);
+  }
 }
