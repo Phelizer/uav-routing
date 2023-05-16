@@ -28,6 +28,11 @@ import { User } from 'src/users/users.service';
 import { join } from 'path';
 import { randomlyReplaceArrayElements } from 'src/utils';
 
+interface ExperimentResultForDownload extends PerformExperimentInputData {
+  mean: number;
+  standardDeviation: number;
+}
+
 @Injectable()
 export class SolverService {
   private getTabuSolver() {
@@ -136,12 +141,8 @@ export class SolverService {
     rightBottomPoint: { lat: 50.384682508571416, lng: 30.74135785432749 },
   };
 
-  performExperiment({
-    algorithm,
-    numberOfPoints,
-    numberOfRuns,
-  }: PerformExperimentInputData) {
-    console.log('here');
+  performExperiment(inputData: PerformExperimentInputData, user: User) {
+    const { algorithm, numberOfPoints, numberOfRuns } = inputData;
     const solver = this.algorithmNameMapping[algorithm];
     const results: Result[] = [];
     for (let i = 0; i < numberOfRuns; i++) {
@@ -155,28 +156,98 @@ export class SolverService {
       console.log('GREEDY_SOLUTION_FITNESS:', greedyFitness);
     }
 
+    const fitnesses = results.map(({ fitness }) => fitness);
+
+    const experimentProcessedResult: ExperimentResultForDownload = {
+      ...inputData,
+      mean: this.roundedAverage(fitnesses),
+      standardDeviation: this.roundedStandardDev(fitnesses),
+    };
+
+    this.lastExperimentByUsers.set(user.id, experimentProcessedResult);
+
     return results;
+  }
+
+  private calculateAverage(numbers: number[]) {
+    if (numbers.length === 0) {
+      return 0;
+    }
+
+    const sum = numbers.reduce((acc, x) => acc + x, 0);
+    return sum / numbers.length;
+  }
+
+  private calculateStandardDev(numbers: number[]) {
+    if (numbers.length === 0) {
+      return 0;
+    }
+
+    const standardDev = Math.sqrt(
+      numbers
+        .map((n) => Math.pow(n - this.calculateAverage(numbers), 2))
+        .reduce((acc, x) => acc + x) / numbers.length,
+    );
+
+    return standardDev;
+  }
+
+  private roundedStandardDev(numbers: number[]) {
+    return this.roundTo2DigitsAfterDot(this.calculateStandardDev(numbers));
+  }
+
+  private roundedAverage(numbers: number[]) {
+    return this.roundTo2DigitsAfterDot(this.calculateAverage(numbers));
+  }
+
+  private roundTo2DigitsAfterDot(n: number) {
+    return Math.round(n * 100) / 100;
   }
 
   // TEMPORAR
   // TODO: replace with db
   private lastSolutionByUsers = new Map<string, Solution>();
 
+  // TEMPORAR
+  // TODO: replace with db
+  private lastExperimentByUsers = new Map<
+    string,
+    ExperimentResultForDownload
+  >();
+
+  // TODO: need to remove the file after it is sent to the user
   async downloadLastResult(user: User) {
     const path = join(process.cwd(), 'tmp', `${user.username}LastResult.json`);
     const lastResult = this.lastSolutionByUsers.get(user.id);
     if (!lastResult) {
-      return new NoLastSolutionYetError();
+      return new NoLastEntityYetError();
     }
 
-    console.log({ lastResult });
     await fs.outputFile(path, JSON.stringify(lastResult));
+    const file = fs.createReadStream(path);
+    return new StreamableFile(file);
+  }
+
+  // TODO: need to remove the file after it is sent to the user
+  async downloadLastExperiment(user: User) {
+    const path = join(
+      process.cwd(),
+      'tmp',
+      `${user.username}LastExperiment.json`,
+    );
+
+    const lastExperiment = this.lastExperimentByUsers.get(user.id);
+    if (!lastExperiment) {
+      return new NoLastEntityYetError();
+    }
+
+    await fs.outputFile(path, JSON.stringify(lastExperiment));
     const file = fs.createReadStream(path);
     return new StreamableFile(file);
   }
 }
 
-export class NoLastSolutionYetError extends HttpException {
+export class NoLastEntityYetError extends HttpException {
   constructor() {
     super('You need to solve your first problem first', 403);
   }

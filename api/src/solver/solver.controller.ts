@@ -8,7 +8,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { CalculateRouteInputData, PerformExperimentInputData } from './models';
-import { NoLastSolutionYetError, SolverService } from './solver.service';
+import { NoLastEntityYetError, SolverService } from './solver.service';
 import { Roles } from 'src/users/roles.decorator';
 import { Role } from 'src/users/role.enum';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
@@ -31,8 +31,11 @@ export class SolverController {
   @Roles(Role.Researcher)
   @UseGuards(JwtAuthGuard)
   @Post('experiment')
-  performExperiment(@Body() body: PerformExperimentInputData) {
-    return this.solverService.performExperiment(body);
+  performExperiment(
+    @Req() { user }: Request & { user: User },
+    @Body() body: PerformExperimentInputData,
+  ) {
+    return this.solverService.performExperiment(body, user);
   }
 
   @Roles(Role.User, Role.Researcher)
@@ -40,7 +43,21 @@ export class SolverController {
   @Get('download-last-result')
   async downloadLastResult(@Req() { user }: Request & { user: User }) {
     const resultOrError = await this.solverService.downloadLastResult(user);
-    if (resultOrError instanceof NoLastSolutionYetError) {
+    if (resultOrError instanceof NoLastEntityYetError) {
+      throw resultOrError;
+    }
+
+    return resultOrError;
+  }
+
+  @Roles(Role.Researcher)
+  @UseGuards(JwtAuthGuard)
+  @Get('download-last-experiment-result')
+  async downloadLastExperimentResult(
+    @Req() { user }: Request & { user: User },
+  ) {
+    const resultOrError = await this.solverService.downloadLastExperiment(user);
+    if (resultOrError instanceof NoLastEntityYetError) {
       throw resultOrError;
     }
 
