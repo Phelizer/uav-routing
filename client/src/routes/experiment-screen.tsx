@@ -35,6 +35,19 @@ const ExperimentScreen_ = observer(() => {
           label="Algorithm:"
         />
 
+        <button
+          className="withLeftMargin"
+          onClick={bloc.downloadLastExperimentResult}
+        >
+          Download last experiment result
+        </button>
+
+        {bloc.experimentResultsPrematureDownloadTry && (
+          <div className="errorMsg withLeftMargin withBottomMargin">
+            {bloc.PREMATURE_DOWNLOAD_ERROR}
+          </div>
+        )}
+
         <button onClick={bloc.submit}>Submit</button>
       </div>
 

@@ -27,6 +27,7 @@ import { createCalculateTimeFitness } from './common';
 import { User } from 'src/users/users.service';
 import { join } from 'path';
 import { randomlyReplaceArrayElements } from 'src/utils';
+import * as R from 'ramda';
 
 interface ExperimentResultForDownload extends PerformExperimentInputData {
   mean: number;
@@ -160,8 +161,8 @@ export class SolverService {
 
     const experimentProcessedResult: ExperimentResultForDownload = {
       ...inputData,
-      mean: this.roundedAverage(fitnesses),
-      standardDeviation: this.roundedStandardDev(fitnesses),
+      mean: this.preparedAverage(fitnesses),
+      standardDeviation: this.preparedStandardDev(fitnesses),
     };
 
     this.lastExperimentByUsers.set(user.id, experimentProcessedResult);
@@ -178,7 +179,7 @@ export class SolverService {
     return sum / numbers.length;
   }
 
-  private calculateStandardDev(numbers: number[]) {
+  private calculateStandardDev = (numbers: number[]) => {
     if (numbers.length === 0) {
       return 0;
     }
@@ -190,19 +191,27 @@ export class SolverService {
     );
 
     return standardDev;
-  }
+  };
 
-  private roundedStandardDev(numbers: number[]) {
-    return this.roundTo2DigitsAfterDot(this.calculateStandardDev(numbers));
-  }
+  private millisecondsToMinutes = (millisec: number) => {
+    return millisec / 60000;
+  };
 
-  private roundedAverage(numbers: number[]) {
-    return this.roundTo2DigitsAfterDot(this.calculateAverage(numbers));
-  }
-
-  private roundTo2DigitsAfterDot(n: number) {
+  private roundTo2DigitsAfterDot = (n: number) => {
     return Math.round(n * 100) / 100;
-  }
+  };
+
+  private preparedStandardDev = R.compose(
+    this.roundTo2DigitsAfterDot,
+    this.millisecondsToMinutes,
+    this.calculateStandardDev,
+  );
+
+  private preparedAverage = R.compose(
+    this.roundTo2DigitsAfterDot,
+    this.millisecondsToMinutes,
+    this.calculateAverage,
+  );
 
   // TEMPORAR
   // TODO: replace with db

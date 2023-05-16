@@ -9,6 +9,7 @@ import {
   PerformExperimentData,
 } from "../api/solver/performExperimentAPI";
 import { downloadLastResultAPI } from "../api/solver/downloadLastResultAPI";
+import { downloadLastExperimentResultAPI } from "../api/solver/downloadLastExperimentResultAPI";
 
 export class SolverService {
   private solutionsStore = solutionsStoreInstance;
@@ -29,5 +30,9 @@ export class SolverService {
 
   async downloadLastResult() {
     return await downloadLastResultAPI();
+  }
+
+  async downloadLastExperimentResult() {
+    return await downloadLastExperimentResultAPI();
   }
 }

@@ -1,9 +1,16 @@
-import { action, computed, makeObservable, observable } from "mobx";
+import {
+  action,
+  computed,
+  makeObservable,
+  observable,
+  runInAction,
+} from "mobx";
 import { Algo } from "../models";
 import { SolverService } from "../services/solver.service";
 import { PerformExperimentData } from "../api/solver/performExperimentAPI";
 import { solutionsStoreInstance } from "../stores/solutions.store";
 import { isNumber } from "../utils/utils";
+import { saveAs } from "file-saver";
 
 interface ExperimentForm {
   numberOfPoints: string;
@@ -124,4 +131,28 @@ export class ExperimentScreenBLoC {
   get bestFitness() {
     return this.fitnesses.reduce((best, x) => (x < best ? x : best), Infinity);
   }
+
+  readonly PREMATURE_DOWNLOAD_ERROR = "You need to perform an experiment first";
+
+  @observable
+  experimentResultsPrematureDownloadTry = false;
+
+  // TODO: describe
+  downloadLastExperimentResult = async () => {
+    try {
+      const blobData = await this.solverService.downloadLastExperimentResult();
+      saveAs(blobData, "experimentResult.json");
+
+      runInAction(() => {
+        this.experimentResultsPrematureDownloadTry = false;
+      });
+    } catch (error: any) {
+      // TODO: poor code, need to refactor:
+      if (error?.message?.includes("403")) {
+        runInAction(() => {
+          this.experimentResultsPrematureDownloadTry = true;
+        });
+      }
+    }
+  };
 }
