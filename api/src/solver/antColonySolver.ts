@@ -71,7 +71,7 @@ export const createAntColonySolver: CreateAntColonySolver =
       timeToNext,
     );
 
-    const antsSolutions: Point[][] = [];
+    const bestSolutionsByAnts: Point[][] = [];
 
     let iterationsWithoutImprovement = 0;
     let bestEstimation = Infinity;
@@ -128,8 +128,21 @@ export const createAntColonySolver: CreateAntColonySolver =
           wasBestSolUpdated = true;
         }
 
-        antsSolutions.push(currentRoute);
+        const currentAntBestSolution = bestSolutionsByAnts[numOfAnt];
+        if (
+          !currentAntBestSolution ||
+          calculateFitness(currentAntBestSolution) >
+            calculateFitness(currentRoute)
+        ) {
+          bestSolutionsByAnts[numOfAnt] = currentRoute;
+        }
+
+        // currentIterationSolutions.push(currentRoute);
+
+        // antsSolutions.push(currentRoute);
       }
+
+      console.log('before pher upd', Math.random());
 
       pheromoneState.evaporateAll();
 
@@ -143,17 +156,27 @@ export const createAntColonySolver: CreateAntColonySolver =
       //   }
       // }
 
-      for (let i = 0; i < bestSolution.length - 2; i++) {
-        const curr = bestSolution[i];
-        const next = bestSolution[i + 1];
-        pheromoneState.add(curr, next, bestEstimation);
+      console.log('during pher upd 1');
+
+      console.log('sols', bestSolutionsByAnts.length);
+      for (const antSolution of bestSolutionsByAnts) {
+        console.log(Math.random());
+        for (let i = 0; i < antSolution.length - 2; i++) {
+          const curr = antSolution[i];
+          const next = antSolution[i + 1];
+          pheromoneState.add(curr, next, calculateFitness(antSolution));
+        }
       }
+
+      console.log('during pher upd 2');
 
       if (wasBestSolUpdated) {
         iterationsWithoutImprovement = 0;
       } else {
         iterationsWithoutImprovement++;
       }
+
+      console.log('after pher upd');
     }
 
     return { route: bestSolution, fitness: bestEstimation };

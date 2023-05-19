@@ -28,13 +28,20 @@ export function changeBase(
   return routeCopy;
 }
 
-export const createCalculateTimeFitness =
-  (
-    speed: KilometersPeHour,
-    maxFlightTime: Milliseconds,
-    chargeTime: Milliseconds,
-  ) =>
-  (route: Point[]) => {
+export const createCalculateTimeFitness = (
+  speed: KilometersPeHour,
+  maxFlightTime: Milliseconds,
+  chargeTime: Milliseconds,
+) => {
+  const cache = new Map();
+
+  return (route: Point[]) => {
+    const idSignature = routeIdSignature(route);
+    if (cache.has(idSignature)) {
+      return cache.get(idSignature);
+    }
+
+    console.time('createCalculateTimeFitness');
     let totalTime = 0;
     let time = 0;
 
@@ -52,8 +59,19 @@ export const createCalculateTimeFitness =
     }
 
     totalTime += time;
+    console.timeEnd('createCalculateTimeFitness');
+
+    if (!cache.has(idSignature)) {
+      cache.set(idSignature, totalTime);
+    }
+
     return totalTime;
   };
+};
+
+function routeIdSignature(route: Point[]) {
+  return route.map(({ id }) => id).join('&');
+}
 
 // not described yet:
 const createTimeFunc =
