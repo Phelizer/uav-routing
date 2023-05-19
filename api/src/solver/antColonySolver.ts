@@ -245,6 +245,7 @@ class PheromoneState {
     }
   }
 
+  // MAKING obj1-obj2 and obj2-obj1 the same key can improve the algo
   private getKey(point1: Point, point2: Point) {
     return JSON.stringify(point1) + JSON.stringify(point2);
   }
