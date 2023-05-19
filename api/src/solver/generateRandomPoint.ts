@@ -16,6 +16,8 @@ export interface Square {
   rightBottomPoint: Coords;
 }
 
+let counter = 0;
+
 const createGenerateRandomPoint =
   (pointType: 'StartBase' | 'RegularBase' | 'RegularPoint') =>
   (square: Square, pointNumber: number): Point => {
@@ -49,6 +51,7 @@ const createGenerateRandomPoint =
           ? 'Base'
           : 'Point'
       } ${pointNumber}`,
+      id: counter++,
     };
   };
 

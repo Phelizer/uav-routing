@@ -19,6 +19,7 @@ interface PointData extends Coords {
   isBase: boolean;
   isStartBase: boolean;
   label: string;
+  id: number;
 }
 
 type StrMinutes = string;
@@ -171,12 +172,15 @@ export class SolverScreenBLoC {
     };
   }
 
+  private counter = 0;
+
   private createEmptyStartBase(): PointData {
     return {
       ...this.createEmptyCoords(),
       isBase: true,
       isStartBase: true,
       label: "Base 1",
+      id: this.counter++,
     };
   }
 
@@ -186,6 +190,7 @@ export class SolverScreenBLoC {
       isBase: true,
       isStartBase: false,
       label: "Base 2",
+      id: this.counter++,
     };
   }
 
@@ -195,6 +200,7 @@ export class SolverScreenBLoC {
       isBase: false,
       isStartBase: false,
       label: `Point ${(this.formData?.points?.length ?? 0) + 1}`,
+      id: this.counter++,
     };
   }
 

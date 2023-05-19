@@ -7,6 +7,7 @@ export interface Point {
   isBase: boolean;
   isStartBase: boolean;
   label: string;
+  id: number;
 }
 
 export type Coords = Pick<Point, 'lat' | 'lng'>;
