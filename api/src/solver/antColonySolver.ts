@@ -247,7 +247,9 @@ class PheromoneState {
 
   // MAKING obj1-obj2 and obj2-obj1 the same key can improve the algo
   private getKey(point1: Point, point2: Point) {
-    return JSON.stringify(point1) + JSON.stringify(point2);
+    const minID = Math.min(point1.id, point2.id);
+    const maxID = Math.max(point1.id, point2.id);
+    return `${minID}&${maxID}`;
   }
 
   get(point1: Point, point2: Point) {
