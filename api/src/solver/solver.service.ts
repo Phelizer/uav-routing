@@ -38,7 +38,7 @@ interface ExperimentResultForDownload extends PerformExperimentInputData {
 export class SolverService {
   private getTabuSolver() {
     const tabuParams: TabuParams = {
-      maxIterationsWithoutImprovement: 30,
+      maxIterationsWithoutImprovement: 10,
       numOfRuns: 30,
       tabuTenure: 100,
     };

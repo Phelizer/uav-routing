@@ -64,11 +64,6 @@ export const createTabuSolver: CreateTabuSolver =
       chargeTime,
     );
 
-    const closestPoints = new Map<Point, Point[]>();
-    for (const point of pointsToObserve) {
-      closestPoints.set(point, getKNearestPoints(point, pointsToObserve, 0.25));
-    }
-
     const besSolutionsByRuns: Solution[] = [];
 
     for (let runNumber = 0; runNumber < numOfRuns; runNumber++) {
@@ -93,12 +88,7 @@ export const createTabuSolver: CreateTabuSolver =
       let iterationsWithoutImprovement = 0;
 
       while (iterationsWithoutImprovement < maxIterationsWithoutImprovement) {
-        const neighbors = getValidChanges(
-          bestCandidate,
-          closestPoints,
-          isValid,
-          bases,
-        );
+        const neighbors = getValidChanges(bestCandidate, isValid, bases);
 
         bestCandidate = neighbors[0];
         bestCandidateFitness = calculateFitness(bestCandidate);
@@ -261,18 +251,15 @@ export const createCalculateStopsFitness =
 
 export function getValidChanges(
   route: Point[],
-  nearestPointsMapping: Map<Point, Point[]>,
   valid: (route: Point[]) => boolean,
   bases: Point[],
 ) {
   const newSols: Point[][] = [];
   for (const [i, point] of route.entries()) {
-    const nearest = nearestPointsMapping.get(point) ?? [];
     // swaps
-    for (const nearPoint of nearest) {
-      if (!nearPoint.isBase) {
-        const indexOfNearest = route.findIndex((p) => p === nearPoint);
-        const newSol = swap(route, i, indexOfNearest);
+    for (const [j, partnerPoint] of route.entries()) {
+      if (!partnerPoint.isBase) {
+        const newSol = swap(route, i, j);
         if (valid(newSol)) {
           newSols.push(newSol);
         }
