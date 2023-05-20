@@ -64,8 +64,6 @@ export const createTabuSolver: CreateTabuSolver =
       chargeTime,
     );
 
-    // const calculateFitness = createCalculateStopsFitness(bases);
-
     const closestPoints = new Map<Point, Point[]>();
     for (const point of pointsToObserve) {
       closestPoints.set(point, getKNearestPoints(point, pointsToObserve, 0.25));
@@ -84,50 +82,52 @@ export const createTabuSolver: CreateTabuSolver =
       );
 
       let bestSolution = initialRoute;
+      let bestSolutionFitness = calculateFitness(bestSolution);
 
-      let bestFitness = calculateFitness(bestSolution);
+      let bestCandidate = initialRoute;
+      let bestCandidateFitness = calculateFitness(bestCandidate);
 
       const tabuList = new TabuList<string>(tabuTenure);
-      let iterationsWithoutImprovement = 0;
-      while (iterationsWithoutImprovement < maxIterationsWithoutImprovement) {
-        let currentSolution = bestSolution;
-        let currentFitness = bestFitness;
-        let isThereFoundNeighborhood = false;
+      tabuList.append(routeIdSignature(initialRoute));
 
-        // const neighbors = generateNeighbors(isValid, currentSolution, bases);
+      let iterationsWithoutImprovement = 0;
+
+      while (iterationsWithoutImprovement < maxIterationsWithoutImprovement) {
         const neighbors = getValidChanges(
-          currentSolution,
+          bestCandidate,
           closestPoints,
           isValid,
           bases,
         );
 
-        for (const neigh of neighbors) {
-          const neighborFitness = calculateFitness(neigh);
-          const str = routeIdSignature(neigh);
-          if (!tabuList.has(str) || neighborFitness < bestFitness) {
-            if (neighborFitness < currentFitness) {
-              currentSolution = neigh;
-              currentFitness = neighborFitness;
-              isThereFoundNeighborhood = true;
-            }
+        bestCandidate = neighbors[0];
+        bestCandidateFitness = calculateFitness(bestCandidate);
+
+        for (const candidate of neighbors) {
+          const candidateFitness = calculateFitness(candidate);
+          if (
+            !tabuList.has(routeIdSignature(candidate)) &&
+            candidateFitness < calculateFitness(bestCandidate)
+          ) {
+            bestCandidate = candidate;
+            bestCandidateFitness = candidateFitness;
           }
         }
 
-        if (isThereFoundNeighborhood) {
-          bestSolution = currentSolution;
-          bestFitness = currentFitness;
-          const str = JSON.stringify(currentSolution);
-          tabuList.append(str);
+        if (bestCandidateFitness < bestSolutionFitness) {
+          bestSolution = bestCandidate;
+          bestSolutionFitness = bestCandidateFitness;
           iterationsWithoutImprovement = 0;
         } else {
           iterationsWithoutImprovement++;
         }
+
+        tabuList.append(routeIdSignature(bestCandidate));
       }
 
       const bestSolutionOfThisRun = {
         route: bestSolution,
-        fitness: bestFitness,
+        fitness: bestSolutionFitness,
       };
 
       besSolutionsByRuns.push(bestSolutionOfThisRun);
