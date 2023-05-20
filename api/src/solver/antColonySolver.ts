@@ -142,8 +142,6 @@ export const createAntColonySolver: CreateAntColonySolver =
         // antsSolutions.push(currentRoute);
       }
 
-      console.log('before pher upd', Math.random());
-
       pheromoneState.evaporateAll();
 
       // for (let numOfAnt = 0; numOfAnt < antsNumber; numOfAnt++) {
@@ -156,11 +154,7 @@ export const createAntColonySolver: CreateAntColonySolver =
       //   }
       // }
 
-      console.log('during pher upd 1');
-
-      console.log('sols', bestSolutionsByAnts.length);
       for (const antSolution of bestSolutionsByAnts) {
-        console.log(Math.random());
         for (let i = 0; i < antSolution.length - 2; i++) {
           const curr = antSolution[i];
           const next = antSolution[i + 1];
@@ -168,15 +162,11 @@ export const createAntColonySolver: CreateAntColonySolver =
         }
       }
 
-      console.log('during pher upd 2');
-
       if (wasBestSolUpdated) {
         iterationsWithoutImprovement = 0;
       } else {
         iterationsWithoutImprovement++;
       }
-
-      console.log('after pher upd');
     }
 
     return { route: bestSolution, fitness: bestEstimation };
@@ -229,23 +219,25 @@ function getAvailableMoves(
   restOfFlightTime: number,
   speed: number,
 ) {
-  // TODO: might need to split availableMoves
-  // into availablePoints and availableBases
-  // and add a priority
-  const availableMoves = [];
+  const availablePoints: Point[] = [];
   for (const point of restOfPointToObserve) {
     if (isAvailablePoint(currentPoint, point, bases, restOfFlightTime, speed)) {
-      availableMoves.push(point);
+      availablePoints.push(point);
     }
   }
 
+  if (availablePoints.length > 0) {
+    return availablePoints;
+  }
+
+  const availableBases: Point[] = [];
   for (const base of bases) {
     if (isAvailableBase(currentPoint, base, restOfFlightTime, speed)) {
-      availableMoves.push(base);
+      availableBases.push(base);
     }
   }
 
-  return availableMoves;
+  return availableBases;
 }
 
 class PheromoneState {

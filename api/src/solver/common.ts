@@ -41,7 +41,6 @@ export const createCalculateTimeFitness = (
       return cache.get(idSignature);
     }
 
-    console.time('createCalculateTimeFitness');
     let totalTime = 0;
     let time = 0;
 
@@ -59,7 +58,6 @@ export const createCalculateTimeFitness = (
     }
 
     totalTime += time;
-    console.timeEnd('createCalculateTimeFitness');
 
     if (!cache.has(idSignature)) {
       cache.set(idSignature, totalTime);
