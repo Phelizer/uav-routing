@@ -1,1 +1,1 @@
-{"algorithm":"tabu","numberOfPoints":10,"numberOfRuns":5,"mean":70.79,"standardDeviation":8.21}
+{"algorithm":"ants","numberOfPoints":25,"numberOfRuns":10,"mean":101.01,"standardDeviation":21.34}

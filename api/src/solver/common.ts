@@ -67,7 +67,7 @@ export const createCalculateTimeFitness = (
   };
 };
 
-function routeIdSignature(route: Point[]) {
+export function routeIdSignature(route: Point[]) {
   return route.map(({ id }) => id).join('&');
 }
 

@@ -39,8 +39,8 @@ export class SolverService {
   private getTabuSolver() {
     const tabuParams: TabuParams = {
       maxIterationsWithoutImprovement: 30,
-      numOfRuns: 10,
-      tabuTenure: 10,
+      numOfRuns: 30,
+      tabuTenure: 100,
     };
 
     return createTabuSolver(tabuParams);

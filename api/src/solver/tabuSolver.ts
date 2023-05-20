@@ -4,6 +4,7 @@ import {
   ejectBase,
   getKNearestPoints,
   isValidRoute,
+  routeIdSignature,
   swap,
 } from './common';
 import { buildValidRoute } from './initValidSolution';
@@ -103,7 +104,7 @@ export const createTabuSolver: CreateTabuSolver =
 
         for (const neigh of neighbors) {
           const neighborFitness = calculateFitness(neigh);
-          const str = JSON.stringify(neigh);
+          const str = routeIdSignature(neigh);
           if (!tabuList.has(str) || neighborFitness < bestFitness) {
             if (neighborFitness < currentFitness) {
               currentSolution = neigh;
