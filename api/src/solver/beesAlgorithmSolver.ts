@@ -1,11 +1,8 @@
 import { randomlyReplaceArrayElements } from 'src/utils';
-import { calculateDistance } from './calculateDistance';
 import {
-  changeBase,
   createCalculateTimeFitness,
-  ejectBase,
-  getKNearestPoints,
   isValidRoute,
+  routeIdSignature,
   swap,
 } from './common';
 import { buildValidRoute } from './initValidSolution';
@@ -46,6 +43,8 @@ export const createBeesAlgorithmSolver =
     const valid = (sol: Point[]) =>
       isValidRoute(sol, maxFlightTime, speed, pointsToObserve);
 
+    const removeDuplicates = createRemoveDuplicates(routeIdSignature);
+
     let solutionPopulation: Point[][] = [];
     for (let i = 0; i < solutionPopulationSize; i++) {
       const { route } = buildValidRoute(
@@ -59,6 +58,8 @@ export const createBeesAlgorithmSolver =
 
       solutionPopulation.push(route);
     }
+
+    solutionPopulation = removeDuplicates(solutionPopulation);
 
     const sortCallback = (a: Point[], b: Point[]) => evaluate(a) - evaluate(b);
     solutionPopulation.sort(sortCallback);
@@ -97,9 +98,10 @@ export const createBeesAlgorithmSolver =
         // );
 
         const nearestSols = getValidChanges(perspectiveSol, valid, allBases);
+        const uniqueNearestSols = removeDuplicates(nearestSols);
 
-        allLocalOptimizationSols.push(...nearestSols);
-        for (const nearestSol of nearestSols) {
+        allLocalOptimizationSols.push(...uniqueNearestSols);
+        for (const nearestSol of uniqueNearestSols) {
           const evaluation = evaluate(nearestSol);
           if (evaluation < recordEvaluation) {
             recordSol = nearestSol;
@@ -107,27 +109,25 @@ export const createBeesAlgorithmSolver =
             betterSolFound = true;
           }
         }
-
-        // update solutions
-        solutionPopulation = [
-          ...solutionPopulation,
-          ...allLocalOptimizationSols,
-        ]
-          .sort(sortCallback)
-          .slice(0, solutionPopulationSize);
       }
+
+      // update solutions
+      solutionPopulation = [...solutionPopulation, ...allLocalOptimizationSols];
+      solutionPopulation = removeDuplicates(solutionPopulation);
+      solutionPopulation = solutionPopulation
+        .sort(sortCallback)
+        .slice(0, solutionPopulationSize);
 
       // breeding
       const pairedSols = pairs(solutionPopulation);
       const descendants: Point[][] = [];
       for (const [route1, route2] of pairedSols) {
-        // const newDescendants = getDescendants(route1, route2, valid);
         const newDescendants = getDescendants(route1, route2, valid);
-
         descendants.push(...newDescendants);
       }
 
-      for (const descendant of descendants) {
+      const uniqueDescendants = removeDuplicates(descendants);
+      for (const descendant of uniqueDescendants) {
         const evaluation = evaluate(descendant);
         if (evaluation < recordEvaluation) {
           recordSol = descendant;
@@ -137,7 +137,9 @@ export const createBeesAlgorithmSolver =
       }
 
       // update solutions
-      solutionPopulation = [...solutionPopulation, ...descendants]
+      solutionPopulation = [...solutionPopulation, ...uniqueDescendants];
+      solutionPopulation = removeDuplicates(solutionPopulation);
+      solutionPopulation = solutionPopulation
         .sort(sortCallback)
         .slice(0, solutionPopulationSize);
 
@@ -329,3 +331,19 @@ function getDescendants(
 
   return newSols;
 }
+
+const createRemoveDuplicates =
+  <T>(makeSignature: { (elem: T): unknown }) =>
+  (arr: T[]) => {
+    const set = new Set();
+    const uniqueElements: T[] = [];
+    for (const elem of arr) {
+      const signature = makeSignature(elem);
+      if (!set.has(signature)) {
+        uniqueElements.push(elem);
+        set.add(signature);
+      }
+    }
+
+    return uniqueElements;
+  };
