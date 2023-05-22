@@ -122,7 +122,7 @@ export function findAvailablePoint(
     calculateTimeBetweenTwoPoints(currentPoint, point, speed),
   );
 
-  const chances = calculateProbabilities(times);
+  const chances = calculateProbabilitiesV2(times);
   const indexOfPointToPick = determineOutcome(chances);
   const pointToPick = availablePoints[indexOfPointToPick];
 
@@ -182,12 +182,37 @@ export function isAvailableBase(
 
 // not described yet
 // TODO: rewrite
-function calculateProbabilities(numbers: number[]): number[] {
-  const sum = numbers.reduce((acc, num) => acc + num, 0);
-  const probabilities = numbers.map((num) => num / sum);
+// function calculateProbabilities(numbers: number[]): number[] {
+//   const sum = numbers.reduce((acc, num) => acc + num, 0);
+//   const probabilities = numbers.map((num) => num / sum);
 
-  return probabilities;
+//   return probabilities;
+// }
+// end of not described block
+
+// not described yet
+function calculateProbabilitiesV2(numbers: number[]): number[] {
+  const max = numbers.reduce((a, b) => (a > b ? a : b));
+  const probabilities = numbers.map((num) => max + 1 - num);
+
+  return normalizeProbs(probabilities);
 }
+
+function normalizeProbs(numbers: number[]) {
+  const sum = numbers.reduce((acc, num) => acc + num, 0);
+  const normalized = numbers.map((num) => num / sum);
+  return normalized;
+}
+
+// function sharpenProbabilities(probabilities: number[], amount: number) {
+//   const sum = probabilities.reduce((acc, val) => acc + val, 0);
+//   const average = sum / probabilities.length;
+//   const scale = Math.pow(average, amount);
+//   const sharpenedProbabilities = probabilities.map((p) => p * scale);
+//   const normalizedProbabilities = sharpenedProbabilities.map((p) => p / sum);
+//   return normalizedProbabilities;
+// }
+
 // end of not described block
 
 // TODO: rewrite
