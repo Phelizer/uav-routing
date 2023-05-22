@@ -10,8 +10,9 @@ import {
 } from './common';
 import { buildValidRoute } from './initValidSolution';
 import { KilometersPeHour, Milliseconds, Point } from './models';
+import { getValidChanges } from './tabuSolver';
 
-const partOfNearestPoints = 0.25;
+// const partOfNearestPoints = 0.25;
 
 export interface BeesAlgorithmParameters {
   solutionPopulationSize: number;
@@ -66,14 +67,14 @@ export const createBeesAlgorithmSolver =
     let recordEvaluation = evaluate(recordSol);
     let itersWithoutImprx = 0;
 
-    const nearestPointsMapping = new Map<Point, Point[]>();
-    const allPoints = [...pointsToObserve, ...allBases];
-    for (const point of allPoints) {
-      nearestPointsMapping.set(
-        point,
-        getKNearestPoints(point, allPoints, partOfNearestPoints),
-      );
-    }
+    // const nearestPointsMapping = new Map<Point, Point[]>();
+    // const allPoints = [...pointsToObserve, ...allBases];
+    // for (const point of allPoints) {
+    //   nearestPointsMapping.set(
+    //     point,
+    //     getKNearestPoints(point, allPoints, partOfNearestPoints),
+    //   );
+    // }
 
     while (itersWithoutImprx < maxOfIterWithoutImpr) {
       const allLocalOptimizationSols: Point[][] = [];
@@ -89,12 +90,13 @@ export const createBeesAlgorithmSolver =
         //   allBases,
         // );
 
-        const nearestSols = getPossiblePermutations(
-          perspectiveSol,
-          nearestPointsMapping,
-          valid,
-          allBases,
-        );
+        // const nearestSols = getPossiblePermutations(
+        //   perspectiveSol,
+        //   valid,
+        //   allBases,
+        // );
+
+        const nearestSols = getValidChanges(perspectiveSol, valid, allBases);
 
         allLocalOptimizationSols.push(...nearestSols);
         for (const nearestSol of nearestSols) {
@@ -175,62 +177,62 @@ function rand(minimum: number, maximum: number) {
   return Math.floor(Math.random() * (maximum - minimum)) + minimum;
 }
 
-function getPossiblePermutations(
-  route: Point[],
-  nearestPointsMapping: Map<Point, Point[]>,
-  valid: (route: Point[]) => boolean,
-  bases: Point[],
-) {
-  const cap = 15;
-  const newSols: Point[][] = [];
-  const routeIndexes = route.map((_, i) => i);
-  const shuffledIndexes = randomlyReplaceArrayElements(routeIndexes);
-  for (const i of shuffledIndexes) {
-    const point = route[i];
-    const nearest = nearestPointsMapping.get(point) ?? [];
-    // swaps
-    for (const nearPoint of nearest) {
-      if (!nearPoint.isBase) {
-        const indexOfNearest = route.findIndex((p) => p === nearPoint);
-        const newSol = swap(route, i, indexOfNearest);
-        if (valid(newSol)) {
-          newSols.push(newSol);
-          //:
-          if (newSols.length >= cap) {
-            return newSols;
-          }
-        }
-      }
-    }
+// function getPossiblePermutations(
+//   route: Point[],
+//   nearestPointsMapping: Map<Point, Point[]>,
+//   valid: (route: Point[]) => boolean,
+//   bases: Point[],
+// ) {
+//   const cap = 15;
+//   const newSols: Point[][] = [];
+//   const routeIndexes = route.map((_, i) => i);
+//   const shuffledIndexes = randomlyReplaceArrayElements(routeIndexes);
+//   for (const i of shuffledIndexes) {
+//     const point = route[i];
+//     const nearest = nearestPointsMapping.get(point) ?? [];
+//     // swaps
+//     for (const nearPoint of nearest) {
+//       if (!nearPoint.isBase) {
+//         const indexOfNearest = route.findIndex((p) => p === nearPoint);
+//         const newSol = swap(route, i, indexOfNearest);
+//         if (valid(newSol)) {
+//           newSols.push(newSol);
+//           //:
+//           if (newSols.length >= cap) {
+//             return newSols;
+//           }
+//         }
+//       }
+//     }
 
-    if (point.isBase) {
-      // base removal
-      const newRemovalSol = ejectBase(route, point);
-      if (valid(newRemovalSol)) {
-        newSols.push(newRemovalSol);
-      }
+//     if (point.isBase) {
+//       // base removal
+//       const newRemovalSol = ejectBase(route, point);
+//       if (valid(newRemovalSol)) {
+//         newSols.push(newRemovalSol);
+//       }
 
-      //:
-      if (newSols.length >= cap) {
-        return newSols;
-      }
+//       //:
+//       if (newSols.length >= cap) {
+//         return newSols;
+//       }
 
-      // base change
-      const newBase = bases.find((b) => b !== point) as Point;
-      const newChangeSol = changeBase(route, i, newBase);
-      if (valid(newChangeSol)) {
-        newSols.push(newChangeSol);
-      }
+//       // base change
+//       const newBase = bases.find((b) => b !== point) as Point;
+//       const newChangeSol = changeBase(route, i, newBase);
+//       if (valid(newChangeSol)) {
+//         newSols.push(newChangeSol);
+//       }
 
-      //:
-      if (newSols.length >= cap) {
-        return newSols;
-      }
-    }
-  }
+//       //:
+//       if (newSols.length >= cap) {
+//         return newSols;
+//       }
+//     }
+//   }
 
-  return newSols;
-}
+//   return newSols;
+// }
 
 // function getDescendants(
 //   route1: Point[],
