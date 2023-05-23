@@ -39,3 +39,25 @@ export const isSolution = (value: unknown): value is Solution =>
   isNumber(value.fitness);
 
 export type Role = "user" | "researcher";
+
+export interface TabuParameters {
+  tabuTenure: string;
+  numOfRuns: string;
+  maxIterationsWithoutImprovement: string;
+}
+
+export interface AntColonyParameters {
+  evaporationRate: string;
+  antsNumber: string;
+  heurInfoImportance: string;
+  pheromoneImportance: string;
+  maxIterationsWithoutImprovement: string;
+}
+
+export interface BeesAlgorithmParameters {
+  maxOfIterWithoutImpr: string;
+  numberOfBestSolutions: string;
+  solutionPopulationSize: string;
+}
+
+export type SettersOf<T> = Record<keyof T, (value: string) => void>;

@@ -5,12 +5,24 @@ import {
   observable,
   runInAction,
 } from "mobx";
-import { Algo } from "../models";
+import {
+  Algo,
+  AntColonyParameters,
+  BeesAlgorithmParameters,
+  SettersOf,
+  TabuParameters,
+} from "../models";
 import { SolverService } from "../services/solver.service";
 import { PerformExperimentData } from "../api/solver/performExperimentAPI";
 import { solutionsStoreInstance } from "../stores/solutions.store";
 import { isNumber } from "../utils/utils";
 import { saveAs } from "file-saver";
+
+interface AlgoParamsFormData {
+  tabu: TabuParameters;
+  bees: BeesAlgorithmParameters;
+  ants: AntColonyParameters;
+}
 
 interface ExperimentForm {
   numberOfPoints: string;
@@ -24,6 +36,53 @@ export class ExperimentScreenBLoC {
   constructor() {
     makeObservable(this);
   }
+
+  @observable
+  algoParamsFormData: AlgoParamsFormData = {
+    tabu: {
+      maxIterationsWithoutImprovement: "",
+      numOfRuns: "",
+      tabuTenure: "",
+    },
+    bees: {
+      maxOfIterWithoutImpr: "",
+      numberOfBestSolutions: "",
+      solutionPopulationSize: "",
+    },
+    ants: {
+      antsNumber: "",
+      evaporationRate: "",
+      heurInfoImportance: "",
+      maxIterationsWithoutImprovement: "",
+      pheromoneImportance: "",
+    },
+  };
+
+  private createSettersOf<T>(algoName: Algo, state: T) {
+    const setters: SettersOf<T> = {} as SettersOf<T>;
+    for (const key in state) {
+      setters[key] = action((value: string) => {
+        (this.algoParamsFormData[algoName] as any)[key] = value;
+      });
+    }
+
+    return setters;
+  }
+
+  tabuParamsSetters = this.createSettersOf(
+    "tabu",
+    this.algoParamsFormData.tabu
+  );
+
+  antsParamsSetters = this.createSettersOf(
+    "ants",
+    this.algoParamsFormData.ants
+  );
+
+  beesParamsSetters = this.createSettersOf(
+    "bees",
+    this.algoParamsFormData.bees
+  );
 
   @observable
   formData: ExperimentForm = {

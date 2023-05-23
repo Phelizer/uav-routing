@@ -7,6 +7,9 @@ import { Dropdown } from "../components/dropdown";
 import { ALGORITHMS } from "../models";
 import { isNumber } from "../utils/utils";
 import { researcherOnly } from "../researcherOnly";
+import { TabuParamsForm } from "./algoParamsForms/tabuParamsForm";
+import { AntsParamsForm } from "./algoParamsForms/antsParamsForm";
+import { BeesParamsForm } from "./algoParamsForms/beesParamsForm";
 
 const ExperimentScreen_ = observer(() => {
   const bloc = useMemo(() => new ExperimentScreenBLoC(), []);
@@ -34,6 +37,27 @@ const ExperimentScreen_ = observer(() => {
           value={bloc.formData.algorithm}
           label="Algorithm:"
         />
+
+        {bloc.formData.algorithm === "tabu" && (
+          <TabuParamsForm
+            value={bloc.algoParamsFormData.tabu}
+            setters={bloc.tabuParamsSetters}
+          />
+        )}
+
+        {bloc.formData.algorithm === "ants" && (
+          <AntsParamsForm
+            value={bloc.algoParamsFormData.ants}
+            setters={bloc.antsParamsSetters}
+          />
+        )}
+
+        {bloc.formData.algorithm === "bees" && (
+          <BeesParamsForm
+            value={bloc.algoParamsFormData.bees}
+            setters={bloc.beesParamsSetters}
+          />
+        )}
 
         <button
           className="withLeftMargin"
