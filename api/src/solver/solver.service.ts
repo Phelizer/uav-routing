@@ -1,6 +1,5 @@
 import { HttpException, Injectable, StreamableFile } from '@nestjs/common';
 import {
-  AlgorithmName,
   CalculateRouteInputData,
   KilometersPeHour,
   Milliseconds,
@@ -11,19 +10,11 @@ import {
   Solver,
 } from './models';
 import * as fs from 'fs-extra';
-import {
-  TabuParams,
-  createCalculateStopsFitness,
-  createTabuSolver,
-} from './tabuSolver';
-import { AntColonyParams, createAntColonySolver } from './antColonySolver';
-import {
-  BeesAlgorithmParameters,
-  createBeesAlgorithmSolver,
-} from './beesAlgorithmSolver';
+import { createTabuSolver } from './tabuSolver';
+import { createAntColonySolver } from './antColonySolver';
+import { createBeesAlgorithmSolver } from './beesAlgorithmSolver';
 import { Square, generateProblem } from './generateRandomPoint';
 import { buildGreedyRoute, buildValidRoute } from './initValidSolution';
-import { createCalculateTimeFitness } from './common';
 import { User } from 'src/users/users.service';
 import { join } from 'path';
 import { randomlyReplaceArrayElements } from 'src/utils';
@@ -36,45 +27,30 @@ interface ExperimentResultForDownload extends PerformExperimentInputData {
 
 @Injectable()
 export class SolverService {
-  private getTabuSolver() {
-    const tabuParams: TabuParams = {
-      maxIterationsWithoutImprovement: 10,
-      numOfRuns: 30,
-      tabuTenure: 100,
-    };
+  private readonly STANDARD_BEES_PARAMS = {
+    maxOfIterWithoutImpr: 30,
+    numberOfBestSolutions: 10,
+    solutionPopulationSize: 20,
+  };
+  private readonly STANDARD_TABU_PARAMS = {
+    maxIterationsWithoutImprovement: 10,
+    numOfRuns: 30,
+    tabuTenure: 100,
+  };
+  private readonly STANDARD_ANTS_PARAMS = {
+    antsNumber: 15,
+    evaporationRate: 0.1,
+    heurInfoImportance: 0.5,
+    pheromoneImportance: 5,
+    maxIterationsWithoutImprovement: 30,
+  };
 
-    return createTabuSolver(tabuParams);
-  }
+  private solver: Solver = createBeesAlgorithmSolver(this.STANDARD_BEES_PARAMS);
 
-  private getAntColonySolver() {
-    const antColonyParams: AntColonyParams = {
-      antsNumber: 15,
-      evaporationRate: 0.1,
-      heurInfoImportance: 0.5,
-      pheromoneImportance: 5,
-      maxIterationsWithoutImprovement: 30,
-    };
-
-    return createAntColonySolver(antColonyParams);
-  }
-
-  private getBeesAlgorithmSolver() {
-    const beesAlgorithmParams: BeesAlgorithmParameters = {
-      maxOfIterWithoutImpr: 30,
-      numberOfBestSolutions: 10,
-      solutionPopulationSize: 20,
-    };
-
-    const beesAlgorithmSolver = createBeesAlgorithmSolver(beesAlgorithmParams);
-    return beesAlgorithmSolver;
-  }
-
-  private solver: Solver = this.getBeesAlgorithmSolver();
-
-  private readonly algorithmNameMapping: Record<AlgorithmName, Solver> = {
-    ants: this.getAntColonySolver(),
-    bees: this.getBeesAlgorithmSolver(),
-    tabu: this.getTabuSolver(),
+  private solverFactoryMapping = {
+    ants: createAntColonySolver,
+    bees: createBeesAlgorithmSolver,
+    tabu: createTabuSolver,
   };
 
   calculateRoute(
@@ -143,8 +119,8 @@ export class SolverService {
   };
 
   performExperiment(inputData: PerformExperimentInputData, user: User) {
-    const { algorithm, numberOfPoints, numberOfRuns } = inputData;
-    const solver = this.algorithmNameMapping[algorithm];
+    const { algorithm, numberOfPoints, numberOfRuns, params } = inputData;
+    const solver = this.solverFactoryMapping[algorithm](params as any);
     const results: Result[] = [];
     for (let i = 0; i < numberOfRuns; i++) {
       console.log('iter', i);

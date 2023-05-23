@@ -1,5 +1,9 @@
 // Domain models:
 
+import { AntColonyParams } from './antColonySolver';
+import { BeesAlgorithmParameters } from './beesAlgorithmSolver';
+import { TabuParams } from './tabuSolver';
+
 // lat and lng values here are in degrees
 export interface Point {
   lat: Degrees;
@@ -48,10 +52,16 @@ export interface CalculateRouteInputData {
   speed: KilometersPeHour;
 }
 
+type AlgorithmParameters =
+  | BeesAlgorithmParameters
+  | TabuParams
+  | AntColonyParams;
+
 export interface PerformExperimentInputData {
   numberOfPoints: number;
   numberOfRuns: number;
   algorithm: AlgorithmName;
+  params: AlgorithmParameters;
 }
 
 export interface Result {
