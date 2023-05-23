@@ -1,1 +1,1 @@
-{"algorithm":"ants","numberOfPoints":25,"numberOfRuns":10,"mean":101.01,"standardDeviation":21.34}
+{"algorithm":"ants","numberOfPoints":10,"numberOfRuns":1,"params":{"antsNumber":11,"pheromoneImportance":4,"heurInfoImportance":0.25,"maxIterationsWithoutImprovement":31,"evaporationRate":0.25},"mean":66.99,"standardDeviation":0}

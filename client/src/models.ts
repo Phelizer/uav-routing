@@ -40,6 +40,11 @@ export const isSolution = (value: unknown): value is Solution =>
 
 export type Role = "user" | "researcher";
 
+export type AlgoritmParameters =
+  | TabuParameters
+  | AntColonyParameters
+  | BeesAlgorithmParameters;
+
 export interface TabuParameters {
   tabuTenure: string;
   numOfRuns: string;

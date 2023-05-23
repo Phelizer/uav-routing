@@ -1,4 +1,4 @@
-import { Algo, Solution, isSolution } from "../../models";
+import { Algo, AlgoritmParameters, Solution, isSolution } from "../../models";
 import { API_BASE_URL } from "../consts";
 import { fetchAPI } from "../fetchAPI";
 import { getStandardHeaders } from "../getStandardHeaders";
@@ -7,6 +7,7 @@ export interface PerformExperimentData {
   algorithm: Algo;
   numberOfRuns: number;
   numberOfPoints: number;
+  params: AlgoritmParameters;
 }
 
 export async function performExperimentAPI(body: PerformExperimentData) {

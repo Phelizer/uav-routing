@@ -7,6 +7,7 @@ import {
 } from "mobx";
 import {
   Algo,
+  AlgoritmParameters,
   AntColonyParameters,
   BeesAlgorithmParameters,
   SettersOf,
@@ -17,6 +18,7 @@ import { PerformExperimentData } from "../api/solver/performExperimentAPI";
 import { solutionsStoreInstance } from "../stores/solutions.store";
 import { isNumber } from "../utils/utils";
 import { saveAs } from "file-saver";
+import * as R from "ramda";
 
 interface AlgoParamsFormData {
   tabu: TabuParameters;
@@ -37,25 +39,31 @@ export class ExperimentScreenBLoC {
     makeObservable(this);
   }
 
+  private readonly INITIAL_TABU_PARAMS = {
+    tabuTenure: "100",
+    numOfRuns: "30",
+    maxIterationsWithoutImprovement: "10",
+  };
+
+  private readonly INITIAL_ANTS_PARAMS = {
+    antsNumber: "15",
+    pheromoneImportance: "5",
+    heurInfoImportance: "0.5",
+    maxIterationsWithoutImprovement: "30",
+    evaporationRate: "0.1",
+  };
+
+  private readonly INITIAL_BEES_PARAMS = {
+    solutionPopulationSize: "20",
+    numberOfBestSolutions: "10",
+    maxOfIterWithoutImpr: "30",
+  };
+
   @observable
   algoParamsFormData: AlgoParamsFormData = {
-    tabu: {
-      maxIterationsWithoutImprovement: "",
-      numOfRuns: "",
-      tabuTenure: "",
-    },
-    bees: {
-      maxOfIterWithoutImpr: "",
-      numberOfBestSolutions: "",
-      solutionPopulationSize: "",
-    },
-    ants: {
-      antsNumber: "",
-      evaporationRate: "",
-      heurInfoImportance: "",
-      maxIterationsWithoutImprovement: "",
-      pheromoneImportance: "",
-    },
+    tabu: R.clone(this.INITIAL_TABU_PARAMS),
+    bees: R.clone(this.INITIAL_BEES_PARAMS),
+    ants: R.clone(this.INITIAL_ANTS_PARAMS),
   };
 
   private createSettersOf<T>(algoName: Algo, state: T) {
@@ -106,11 +114,26 @@ export class ExperimentScreenBLoC {
     this.formData.algorithm = value;
   };
 
+  private objOfStrToObjOfNum<T extends Record<string, string>>(obj: T) {
+    const objOfNum: Record<keyof T, number> = {} as Record<keyof T, number>;
+    for (const key in obj) {
+      objOfNum[key] = parseFloat(obj[key]);
+    }
+
+    return objOfNum;
+  }
+
   submit = async () => {
     const data: PerformExperimentData = {
       algorithm: this.formData.algorithm,
       numberOfPoints: parseInt(this.formData.numberOfPoints),
       numberOfRuns: parseInt(this.formData.numberOfRuns),
+      params: this.objOfStrToObjOfNum(
+        this.algoParamsFormData[this.formData.algorithm] as unknown as Record<
+          string,
+          string
+        >
+      ) as unknown as AlgoritmParameters,
     };
 
     await this.solverService.performExperiment(data);
