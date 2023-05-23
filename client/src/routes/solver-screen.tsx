@@ -1,9 +1,8 @@
-import { observer } from "mobx-react-lite";
+import { Observer, observer } from "mobx-react-lite";
 import { Input } from "../components/input";
 import { SolverScreenBLoC } from "./solver-screen.bloc";
 import {
   ChangeEvent,
-  ChangeEventHandler,
   Fragment,
   useCallback,
   useEffect,
@@ -13,6 +12,8 @@ import {
 } from "react";
 import "./solver-screen.css";
 import * as d3 from "d3";
+import { Point } from "../models";
+import { GoogleMap, MarkerF, useLoadScript } from "@react-google-maps/api";
 
 export const SolverScreen = observer(() => {
   const bloc = useMemo(() => new SolverScreenBLoC(), []);
@@ -146,7 +147,9 @@ export const SolverScreen = observer(() => {
         </div>
       ))}
 
-      {bloc.arrows.length !== 0 && bloc.coords.length !== 0 && (
+      <Map route={bloc.route} />
+
+      {/* {bloc.arrows.length !== 0 && bloc.coords.length !== 0 && (
         <div className="canvContainer">
           <PointComponent
             className="canv"
@@ -158,7 +161,7 @@ export const SolverScreen = observer(() => {
             yOffsetInCoordinates={bloc.yOffsetInCoordinates}
           />
         </div>
-      )}
+      )} */}
     </div>
   );
 });
@@ -291,4 +294,74 @@ const PointComponent = ({
   );
 };
 
-export default PointComponent;
+interface MapProps {
+  route: Point[];
+}
+
+function Map({ route }: MapProps) {
+  const { isLoaded } = useLoadScript({
+    // TODO: extract to the env
+    googleMapsApiKey: "AIzaSyBac5fMOsuUMUEoE_7Sq1CgRyh5xsbzKE4",
+  });
+
+  const [map, setMap] = useState<google.maps.Map | null>(null);
+
+  useEffect(() => {
+    if (!map) {
+      return;
+    }
+
+    const bounds = new google.maps.LatLngBounds();
+    route.forEach(({ lat, lng }) => {
+      console.log({ bounds });
+      bounds.extend({ lat, lng });
+    });
+    map.fitBounds(bounds);
+  }, [map, route]);
+
+  const onLoad = useCallback((map: google.maps.Map) => {
+    setMap(map);
+  }, []);
+
+  return (
+    <Observer>
+      {() => (
+        <div className="App">
+          {!isLoaded ? (
+            <h1>Loading...</h1>
+          ) : (
+            <div
+              style={{
+                backgroundColor: "lightgrey",
+                width: "400px",
+                height: "400px",
+                borderWidth: "5px",
+                borderColor: "black",
+              }}
+            >
+              <div
+                style={{
+                  backgroundColor: "lightblue",
+                  width: "350px",
+                  height: "350",
+                  borderWidth: "5px",
+                  borderColor: "black",
+                }}
+              >
+                <GoogleMap
+                  mapContainerClassName="map-container"
+                  mapContainerStyle={{ height: "100vh", width: "100vw" }}
+                  onLoad={onLoad}
+                >
+                  {route.map((point, i) => (
+                    <MarkerF position={point} key={i} />
+                  ))}
+                </GoogleMap>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+    </Observer>
+  );
+}
