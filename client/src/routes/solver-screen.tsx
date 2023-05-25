@@ -15,6 +15,7 @@ import * as d3 from "d3";
 import { Point } from "../models";
 import { GoogleMap, MarkerF, useLoadScript } from "@react-google-maps/api";
 import { Map } from "../components/Map";
+import Switch from "react-switch";
 
 export const SolverScreen = observer(() => {
   const bloc = useMemo(() => new SolverScreenBLoC(), []);
@@ -148,21 +149,39 @@ export const SolverScreen = observer(() => {
         </div>
       ))}
 
-      <Map route={bloc.route} delay={300} />
+      <div className="row withBottomMargin">
+        <span className="withLeftMargin">D3</span>
 
-      {/* {bloc.arrows.length !== 0 && bloc.coords.length !== 0 && (
-        <div className="canvContainer">
-          <PointComponent
-            className="canv"
-            coordinates={bloc.coords}
-            arrowPairs={bloc.arrows}
-            coloredPoints={bloc.colors}
-            delay={300}
-            xOffsetInCoordinates={bloc.xOffsetInCoordinates}
-            yOffsetInCoordinates={bloc.yOffsetInCoordinates}
-          />
-        </div>
-      )} */}
+        <Switch
+          className="withLeftMargin"
+          checked={bloc.visualizationType === "googlemaps"}
+          onChange={bloc.toggleVisualizationType}
+          checkedIcon={false}
+          uncheckedIcon={false}
+        />
+
+        <span className="withLeftMargin">Google Maps</span>
+      </div>
+
+      {bloc.visualizationType === "googlemaps" && bloc.route.length !== 0 && (
+        <Map route={bloc.route} delay={300} />
+      )}
+
+      {bloc.visualizationType === "d3" &&
+        bloc.arrows.length !== 0 &&
+        bloc.coords.length !== 0 && (
+          <div className="canvContainer">
+            <PointComponent
+              className="canv"
+              coordinates={bloc.coords}
+              arrowPairs={bloc.arrows}
+              coloredPoints={bloc.colors}
+              delay={300}
+              xOffsetInCoordinates={bloc.xOffsetInCoordinates}
+              yOffsetInCoordinates={bloc.yOffsetInCoordinates}
+            />
+          </div>
+        )}
     </div>
   );
 });

@@ -38,6 +38,8 @@ type StringFieldsOfInputDataForm = {
   [Key in keyof InputDataForm]: InputDataForm[Key] extends string ? Key : never;
 }[keyof InputDataForm];
 
+type VisualizationType = "googlemaps" | "d3";
+
 export class SolverScreenBLoC {
   @observable
   formData: InputDataForm = {
@@ -50,6 +52,18 @@ export class SolverScreenBLoC {
   };
 
   private solverService = new SolverService();
+
+  @observable
+  visualizationType: VisualizationType = "googlemaps";
+
+  @action
+  toggleVisualizationType = () => {
+    if (this.visualizationType === "googlemaps") {
+      this.visualizationType = "d3";
+    } else {
+      this.visualizationType = "googlemaps";
+    }
+  };
 
   @observable
   fileErrorMsg = "";
