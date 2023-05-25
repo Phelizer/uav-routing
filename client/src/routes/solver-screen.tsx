@@ -317,6 +317,11 @@ function Map({ route }: MapProps) {
       bounds.extend({ lat, lng });
     });
     map.fitBounds(bounds);
+
+    const paths = createPaths(route);
+    for (const path of paths) {
+      path.setMap(map);
+    }
   }, [map, route]);
 
   const onLoad = useCallback((map: google.maps.Map) => {
@@ -328,7 +333,7 @@ function Map({ route }: MapProps) {
       {() => (
         <div className="App">
           {!isLoaded ? (
-            <h1>Loading...</h1>
+            <h1>Map is loading...</h1>
           ) : (
             <div
               style={{
@@ -364,4 +369,37 @@ function Map({ route }: MapProps) {
       )}
     </Observer>
   );
+}
+
+function createPaths(route: Point[]) {
+  const polylines: google.maps.Polyline[] = [];
+  for (let i = 1; i < route.length; i++) {
+    const previousPoint = route[i - 1];
+    const currentPoint = route[i];
+    polylines.push(createArrow(previousPoint, currentPoint));
+  }
+
+  return polylines;
+}
+
+function createArrow(point1: Point, point2: Point) {
+  const arrowIconData = {
+    path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+  };
+
+  const path = new google.maps.Polyline({
+    path: [point1, point2],
+    icons: [
+      {
+        icon: arrowIconData,
+        offset: "100%",
+      },
+    ],
+    geodesic: true,
+    strokeColor: "#FF0000",
+    strokeOpacity: 1.0,
+    strokeWeight: 2,
+  });
+
+  return path;
 }
