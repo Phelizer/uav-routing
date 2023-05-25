@@ -8,7 +8,7 @@ interface MapProps {
   delay: number;
 }
 
-export function Map({ route, delay }: MapProps) {
+export function GoogleMapsVisualization({ route, delay }: MapProps) {
   const { isLoaded } = useLoadScript({
     // TODO: extract to the env
     googleMapsApiKey: "AIzaSyBac5fMOsuUMUEoE_7Sq1CgRyh5xsbzKE4",
