@@ -1,7 +1,4 @@
 {
   "dependencies": {},
-  "devDependencies": {},
-  "scripts": {
-    "start": "docker-compose up -d"
-  }
+  "devDependencies": {}
 }
