@@ -8,6 +8,7 @@ interface MapProps {
   delay: number;
 }
 
+// TODO: think if it is needed to refactor this component to use BLoC
 export function GoogleMapsVisualization({ route, delay }: MapProps) {
   const { isLoaded } = useLoadScript({
     // TODO: extract to the env

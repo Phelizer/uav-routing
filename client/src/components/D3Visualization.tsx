@@ -12,6 +12,7 @@ interface PointComponentProps {
   yOffsetInCoordinates?: number;
 }
 
+// TODO: think if it is needed to refactor this component to use BLoC
 export function D3Visualization({
   coordinates,
   arrowPairs,
