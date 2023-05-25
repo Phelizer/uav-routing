@@ -5,9 +5,10 @@ import { Observer } from "mobx-react-lite";
 
 interface MapProps {
   route: Point[];
+  delay: number;
 }
 
-export function Map({ route }: MapProps) {
+export function Map({ route, delay }: MapProps) {
   const { isLoaded } = useLoadScript({
     // TODO: extract to the env
     googleMapsApiKey: "AIzaSyBac5fMOsuUMUEoE_7Sq1CgRyh5xsbzKE4",
@@ -27,11 +28,21 @@ export function Map({ route }: MapProps) {
     });
     map.fitBounds(bounds);
 
+    const timeouts: NodeJS.Timeout[] = [];
     const paths = createPaths(route);
-    for (const path of paths) {
-      path.setMap(map);
+    for (let i = 0; i < paths.length; i++) {
+      const path = paths[i];
+      const timeout = setTimeout(() => {
+        path.setMap(map);
+      }, i * delay);
+
+      timeouts.push(timeout);
     }
-  }, [map, route]);
+
+    return () => {
+      timeouts.forEach(clearTimeout);
+    };
+  }, [delay, map, route]);
 
   const onLoad = useCallback((map: google.maps.Map) => {
     setMap(map);

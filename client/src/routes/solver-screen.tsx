@@ -148,7 +148,7 @@ export const SolverScreen = observer(() => {
         </div>
       ))}
 
-      <Map route={bloc.route} />
+      <Map route={bloc.route} delay={300} />
 
       {/* {bloc.arrows.length !== 0 && bloc.coords.length !== 0 && (
         <div className="canvContainer">
@@ -204,8 +204,7 @@ const PointComponent = ({
   }, []);
 
   useEffect(() => {
-    // @ts-ignore
-    const timeouts = [];
+    const timeouts: NodeJS.Timeout[] = [];
 
     if (coordinates && d3Container.current) {
       const svg = d3.select(d3Container.current);
@@ -280,7 +279,6 @@ const PointComponent = ({
     }
 
     return () => {
-      //@ts-ignore
       timeouts.forEach(clearTimeout);
     };
   }, [coordinates, width, height, arrowPairs, coloredPoints]);
