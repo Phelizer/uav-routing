@@ -4,6 +4,8 @@ import { useWithPreventedDefault } from "../utils/useWithPreventedDefault";
 import { Dropdown } from "../components/dropdown";
 import { signupScreenBLoCInstance as bloc } from "./signup-screen.bloc";
 import { ROLES } from "../models";
+import "./signup-screen.css";
+import { Link, Navigate } from "react-router-dom";
 
 export const SignupScreen = observer(() => {
   const onSubmit = useWithPreventedDefault(bloc.submitForm);
@@ -32,6 +34,16 @@ export const SignupScreen = observer(() => {
         />
 
         <button type="submit">Sign up</button>
+
+        {!!bloc.errorMsg && (
+          <div className="errorMsg withLeftMargin withTopMargin">
+            {bloc.errorMsg}
+          </div>
+        )}
+
+        {bloc.signedupSuccessfully && <Navigate to={"/"} />}
+
+        <Link to="/">Already have account?</Link>
       </form>
     </div>
   );

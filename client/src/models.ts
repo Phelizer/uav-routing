@@ -38,7 +38,7 @@ export const isSolution = (value: unknown): value is Solution =>
   "fitness" in value &&
   isNumber(value.fitness);
 
-export const ROLES = <const>["user", "researcher"];
+export const ROLES = ["user", "researcher"] as const;
 export type Role = (typeof ROLES)[number];
 
 export type AlgoritmParameters =
@@ -67,3 +67,24 @@ export interface BeesAlgorithmParameters {
 }
 
 export type SettersOf<T> = Record<keyof T, (value: string) => void>;
+
+export interface HttpError {
+  response: string;
+  status: number;
+  message: string;
+  name: string;
+}
+
+export function isHttpError(value: unknown): value is HttpError {
+  return (
+    isRecord(value) &&
+    "response" in value &&
+    isString(value.response) &&
+    "status" in value &&
+    isNumber(value.status) &&
+    "message" in value &&
+    isString(value.message) &&
+    "name" in value &&
+    isString(value.name)
+  );
+}
