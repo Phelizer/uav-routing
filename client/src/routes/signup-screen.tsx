@@ -1,10 +1,11 @@
 import { observer } from "mobx-react-lite";
 import { Input } from "../components/input";
-import { loginScreenBLoCInstance as bloc } from "./login-screen.bloc";
 import { useWithPreventedDefault } from "../utils/useWithPreventedDefault";
-import { Link } from "react-router-dom";
+import { Dropdown } from "../components/dropdown";
+import { signupScreenBLoCInstance as bloc } from "./signup-screen.bloc";
+import { ROLES } from "../models";
 
-export const LoginScreen = observer(() => {
+export const SignupScreen = observer(() => {
   const onSubmit = useWithPreventedDefault(bloc.submitForm);
 
   return (
@@ -23,10 +24,15 @@ export const LoginScreen = observer(() => {
           type="password"
         />
 
-        <button type="submit">Log in</button>
-      </form>
+        <Dropdown
+          label="Role"
+          value={bloc.formData.role}
+          onChange={bloc.setRole}
+          options={ROLES}
+        />
 
-      <Link to="/signup">Create account</Link>
+        <button type="submit">Sign up</button>
+      </form>
     </div>
   );
 });

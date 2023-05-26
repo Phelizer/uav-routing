@@ -7,6 +7,7 @@ import ErrorPage from "./error-page";
 import { AuthWrapper } from "./AuthWrapper";
 import { WithNavBar } from "./WithNavBar";
 import { ExperimentScreen } from "./routes/experiment-screen";
+import { SignupScreen } from "./routes/signup-screen";
 
 // TODO: remove this verification code:
 if (
@@ -29,6 +30,12 @@ const router = createBrowserRouter([
         <ExperimentScreen />
       </WithNavBar>
     ),
+    errorElement: <ErrorPage />,
+  },
+  {
+    path: "/signup",
+    element: <SignupScreen />,
+    errorElement: <ErrorPage />,
   },
 ]);
 

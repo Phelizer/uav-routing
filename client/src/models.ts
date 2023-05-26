@@ -38,7 +38,8 @@ export const isSolution = (value: unknown): value is Solution =>
   "fitness" in value &&
   isNumber(value.fitness);
 
-export type Role = "user" | "researcher";
+export const ROLES = <const>["user", "researcher"];
+export type Role = (typeof ROLES)[number];
 
 export type AlgoritmParameters =
   | TabuParameters
