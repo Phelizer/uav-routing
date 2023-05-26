@@ -52,7 +52,7 @@ export interface CalculateRouteInputData {
   speed: KilometersPeHour;
 }
 
-type AlgorithmParameters =
+export type AlgorithmParameters =
   | BeesAlgorithmParameters
   | TabuParams
   | AntColonyParams;

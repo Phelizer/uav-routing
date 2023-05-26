@@ -1,5 +1,7 @@
 import { HttpException, Injectable, StreamableFile } from '@nestjs/common';
 import {
+  AlgorithmName,
+  AlgorithmParameters,
   CalculateRouteInputData,
   KilometersPeHour,
   Milliseconds,
@@ -138,7 +140,7 @@ export class SolverService {
     rightBottomPoint: { lat: 50.384682508571416, lng: 30.74135785432749 },
   };
 
-  performExperiment(inputData: PerformExperimentInputData, user: User) {
+  async performExperiment(inputData: PerformExperimentInputData, user: User) {
     const { algorithm, numberOfPoints, numberOfRuns, params } = inputData;
     const solver = this.solverFactoryMapping[algorithm](params as any);
     const results: Result[] = [];
@@ -161,9 +163,27 @@ export class SolverService {
       standardDeviation: this.preparedStandardDev(fitnesses),
     };
 
-    this.lastExperimentByUsers.set(user.id, experimentProcessedResult);
+    await this.saveExperimentToDB(user.id, experimentProcessedResult);
 
     return results;
+  }
+
+  private async saveExperimentToDB(
+    userID: number,
+    experimendResult: ExperimentResultForDownload,
+  ) {
+    await this.dbService.runQuery(`
+      INSERT INTO experiments (user_id, numberOfPoints, numberOfRuns, algorithm, params, mean, standardDeviation)
+      VALUES (
+        ${userID},
+        ${experimendResult.numberOfPoints},
+        ${experimendResult.numberOfRuns},
+        '${experimendResult.algorithm}',
+        '${JSON.stringify(experimendResult.params)}',
+        ${experimendResult.mean},
+        ${experimendResult.standardDeviation}
+      )
+    `);
   }
 
   private calculateAverage(numbers: number[]) {
@@ -208,13 +228,6 @@ export class SolverService {
     this.millisecondsToMinutes,
     this.calculateAverage,
   );
-
-  // TEMPORAR
-  // TODO: replace with db
-  private lastExperimentByUsers = new Map<
-    number,
-    ExperimentResultForDownload
-  >();
 
   // TODO: need to remove the file after it is sent to the user
   async downloadLastResult(user: User) {
@@ -276,7 +289,8 @@ export class SolverService {
       `${user.username}LastExperiment.json`,
     );
 
-    const lastExperiment = this.lastExperimentByUsers.get(user.id);
+    // const lastExperiment = this.lastExperimentByUsers.get(user.id);
+    const lastExperiment = await this.getLastExperiment(user.id);
     if (!lastExperiment) {
       return new NoLastEntityYetError();
     }
@@ -285,6 +299,37 @@ export class SolverService {
     const file = fs.createReadStream(path);
     return new StreamableFile(file);
   }
+
+  private async getLastExperiment(userID: number) {
+    const { rows } = await this.dbService.runQuery(`
+      SELECT *
+      FROM experiments
+      WHERE user_id = ${userID}
+      ORDER BY created_at DESC
+      LIMIT 1
+    `);
+
+    if (rows.length === 0) {
+      return;
+    }
+
+    const dbExperiment = rows[0];
+
+    return this.dbToAppExperimentAdapter(dbExperiment);
+  }
+
+  private dbToAppExperimentAdapter = (
+    dbExperiment: DBExperiment,
+  ): ExperimentResultForDownload => {
+    return {
+      algorithm: dbExperiment.algorithm as AlgorithmName,
+      mean: dbExperiment.mean,
+      standardDeviation: dbExperiment.standarddeviation,
+      numberOfPoints: dbExperiment.numberofpoints,
+      numberOfRuns: dbExperiment.numberofruns,
+      params: dbExperiment.params,
+    };
+  };
 }
 
 export class NoLastEntityYetError extends HttpException {
@@ -303,5 +348,17 @@ interface DBPoint {
   isstartbase: boolean;
   label: string;
   sequence_number: number;
+  created_at: unknown;
+}
+
+interface DBExperiment {
+  id: number;
+  user_id: number;
+  numberofpoints: number;
+  numberofruns: number;
+  algorithm: string;
+  params: AlgorithmParameters;
+  mean: number;
+  standarddeviation: number;
   created_at: unknown;
 }

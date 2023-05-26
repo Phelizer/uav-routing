@@ -31,11 +31,11 @@ export class SolverController {
   @Roles(Role.Researcher)
   @UseGuards(JwtAuthGuard)
   @Post('experiment')
-  performExperiment(
+  async performExperiment(
     @Req() { user }: Request & { user: User },
     @Body() body: PerformExperimentInputData,
   ) {
-    return this.solverService.performExperiment(body, user);
+    return await this.solverService.performExperiment(body, user);
   }
 
   @Roles(Role.User, Role.Researcher)
