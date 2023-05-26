@@ -30,6 +30,7 @@ export class DBService implements OnModuleInit {
           id SERIAL PRIMARY KEY,
           username VARCHAR(50) NOT NULL,
           password VARCHAR(100) NOT NULL,
+          roles VARCHAR(50)[],
           created_at TIMESTAMP DEFAULT NOW()
         );
 
@@ -65,8 +66,8 @@ export class DBService implements OnModuleInit {
       console.log({ init });
 
       const initUsers = await this.runQuery(`
-        INSERT INTO users (username, password)
-        VALUES ('researcher', '1111'), ('user', '1111');
+        INSERT INTO users (username, password, roles)
+        VALUES ('researcher', '1111', ARRAY['researcher']), ('user', '1111', ARRAY['user']);
       `);
 
       console.log({ initUsers });

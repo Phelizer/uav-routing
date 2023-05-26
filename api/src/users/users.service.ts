@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { DBService } from 'src/db/db.service';
 import { Role } from 'src/users/role.enum';
 
 export interface User {
@@ -10,23 +11,18 @@ export interface User {
 
 @Injectable()
 export class UsersService {
-  // TODO: store only encrypyted version of passwords
-  private readonly users: User[] = [
-    {
-      id: 'user1',
-      username: 'user',
-      password: '1111',
-      roles: [Role.User],
-    },
-    {
-      id: 'user2',
-      username: 'researcher',
-      password: '1111',
-      roles: [Role.Researcher],
-    },
-  ];
+  constructor(private dbService: DBService) {}
 
+  // TODO: store only encrypyted version of passwords
   async findUser(username: string): Promise<User | undefined> {
-    return this.users.find((usr) => usr.username === username);
+    const { rows } = await this.dbService.runQuery(
+      `SELECT * FROM users WHERE username = '${username}';`,
+    );
+
+    const user = rows?.[0];
+
+    if (user) {
+      return { ...user, id: `${user.id}` };
+    }
   }
 }
