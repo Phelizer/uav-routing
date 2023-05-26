@@ -17,6 +17,67 @@ export class DBService implements OnModuleInit {
     });
     try {
       await this.pool.connect();
+      const dropRes = await this.runQuery(`
+        DROP SCHEMA public CASCADE;
+        CREATE SCHEMA public;
+        GRANT ALL ON SCHEMA public TO public;
+      `);
+
+      console.log({ dropRes });
+
+      const init = await this.runQuery(`
+        CREATE TABLE IF NOT EXISTS users (
+          id SERIAL PRIMARY KEY,
+          username VARCHAR(50) NOT NULL,
+          password VARCHAR(100) NOT NULL,
+          created_at TIMESTAMP DEFAULT NOW()
+        );
+
+        CREATE TABLE IF NOT EXISTS solutions (
+          id SERIAL PRIMARY KEY,
+          user_id INT REFERENCES users(id),
+          fitness NUMERIC,
+          created_at TIMESTAMP DEFAULT NOW()
+        );
+
+        CREATE TABLE IF NOT EXISTS points (
+            id SERIAL PRIMARY KEY,
+            solution_id INT REFERENCES solutions(id),
+            lat NUMERIC,
+            lng NUMERIC,
+            sequence_number INT,
+            created_at TIMESTAMP DEFAULT NOW()
+        );
+
+        CREATE TABLE IF NOT EXISTS experiments (
+          id SERIAL PRIMARY KEY,
+          user_id INT REFERENCES users(id),
+          numberOfPoints NUMERIC,
+          numberOfRuns NUMERIC,
+          algorithm VARCHAR(4),
+          params JSONB,
+          mean NUMERIC,
+          standardDeviation NUMERIC,
+          created_at TIMESTAMP DEFAULT NOW()
+        );
+
+      `);
+      console.log({ init });
+
+      const initUsers = await this.runQuery(`
+        INSERT INTO users (username, password)
+        VALUES ('researcher', '1111'), ('user', '1111');
+      `);
+
+      console.log({ initUsers });
+
+      const sdf2 = await this.runQuery(`
+        SELECT table_name
+        FROM information_schema.tables
+        WHERE table_schema = 'public'
+        ORDER BY table_name;
+      `);
+      console.log({ sdf2: sdf2.rows });
       console.log('Connected to the database.');
     } catch (err) {
       console.error('Error connecting to the database.', err);
