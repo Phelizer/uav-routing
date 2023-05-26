@@ -21,11 +21,11 @@ export class SolverController {
   @Roles(Role.User, Role.Researcher)
   @UseGuards(JwtAuthGuard)
   @Post('solve')
-  calculateRoute(
+  async calculateRoute(
     @Req() { user }: Request & { user: User },
     @Body() body: CalculateRouteInputData,
   ) {
-    return this.solverService.calculateRoute(body, user);
+    return await this.solverService.calculateRoute(body, user);
   }
 
   @Roles(Role.Researcher)

@@ -19,6 +19,7 @@ import { User } from 'src/users/users.service';
 import { join } from 'path';
 import { randomlyReplaceArrayElements } from 'src/utils';
 import * as R from 'ramda';
+import { DBService } from 'src/db/db.service';
 
 interface ExperimentResultForDownload extends PerformExperimentInputData {
   mean: number;
@@ -27,6 +28,8 @@ interface ExperimentResultForDownload extends PerformExperimentInputData {
 
 @Injectable()
 export class SolverService {
+  constructor(private readonly dbService: DBService) {}
+
   private readonly STANDARD_BEES_PARAMS = {
     maxOfIterWithoutImpr: 30,
     numberOfBestSolutions: 10,
@@ -53,10 +56,10 @@ export class SolverService {
     tabu: createTabuSolver,
   };
 
-  calculateRoute(
+  async calculateRoute(
     inputData: CalculateRouteInputData,
     user: User,
-  ): Result & Record<string, unknown> {
+  ): Promise<Result & Record<string, unknown>> {
     const {
       pointsToObserve,
       startBase,
@@ -85,7 +88,7 @@ export class SolverService {
 
     console.timeEnd('algorithm time');
 
-    this.lastSolutionByUsers.set(user.id, solution);
+    await this.saveSolutionToDB(user.id, solution);
 
     return solution;
 
@@ -111,6 +114,23 @@ export class SolverService {
     //   stops: calcualteFitnessByStops(route),
     //   totalTime: calculateFitnessByTime(route),
     // };
+  }
+
+  private async saveSolutionToDB(userID: number, solution: Solution) {
+    const { rows } = await this.dbService.runQuery(`
+      INSERT INTO solutions (user_id, fitness)
+      VALUES (${userID}, ${solution.fitness})
+      RETURNING id;
+    `);
+
+    const solutionID = rows[0].id;
+
+    for (const [i, point] of solution.route.entries()) {
+      await this.dbService.runQuery(`
+        INSERT INTO points (solution_id, domain_id, lat, lng, isBase, isStartBase, label, sequence_number)
+        VALUES (${solutionID}, ${point.id}, ${point.lat}, ${point.lng}, ${point.isBase}, ${point.isStartBase}, '${point.label}', ${i});
+      `);
+    }
   }
 
   private readonly standardSquare: Square = {
@@ -191,19 +211,16 @@ export class SolverService {
 
   // TEMPORAR
   // TODO: replace with db
-  private lastSolutionByUsers = new Map<string, Solution>();
-
-  // TEMPORAR
-  // TODO: replace with db
   private lastExperimentByUsers = new Map<
-    string,
+    number,
     ExperimentResultForDownload
   >();
 
   // TODO: need to remove the file after it is sent to the user
   async downloadLastResult(user: User) {
     const path = join(process.cwd(), 'tmp', `${user.username}LastResult.json`);
-    const lastResult = this.lastSolutionByUsers.get(user.id);
+
+    const lastResult = await this.getLastResult(user.id);
     if (!lastResult) {
       return new NoLastEntityYetError();
     }
@@ -212,6 +229,44 @@ export class SolverService {
     const file = fs.createReadStream(path);
     return new StreamableFile(file);
   }
+
+  private async getLastResult(userID: number): Promise<Solution | undefined> {
+    const { rows } = await this.dbService.runQuery(`
+    WITH last_solution AS (
+      SELECT id, fitness
+      FROM solutions
+      WHERE user_id = ${userID}
+      ORDER BY created_at DESC
+      LIMIT 1
+    )
+    SELECT points.*, last_solution.fitness
+    FROM last_solution
+    JOIN points ON last_solution.id = points.solution_id;
+    `);
+
+    if (rows.length === 0) {
+      return;
+    }
+
+    const route = rows.map(this.dbToAppPointAdapter);
+    const fitness = rows[0].fitness;
+
+    return {
+      fitness,
+      route,
+    };
+  }
+
+  private dbToAppPointAdapter = (dbPoint: DBPoint): Point => {
+    return {
+      id: dbPoint.domain_id,
+      isBase: dbPoint.isbase,
+      isStartBase: dbPoint.isstartbase,
+      label: dbPoint.label,
+      lat: dbPoint.lat,
+      lng: dbPoint.lng,
+    };
+  };
 
   // TODO: need to remove the file after it is sent to the user
   async downloadLastExperiment(user: User) {
@@ -236,4 +291,17 @@ export class NoLastEntityYetError extends HttpException {
   constructor() {
     super('You need to solve your first problem first', 403);
   }
+}
+
+interface DBPoint {
+  id: number;
+  domain_id: number;
+  solution_id: number;
+  lat: number;
+  lng: number;
+  isbase: boolean;
+  isstartbase: boolean;
+  label: string;
+  sequence_number: number;
+  created_at: unknown;
 }

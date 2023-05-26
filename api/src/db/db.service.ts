@@ -17,13 +17,13 @@ export class DBService implements OnModuleInit {
     });
     try {
       await this.pool.connect();
-      const dropRes = await this.runQuery(`
-        DROP SCHEMA public CASCADE;
-        CREATE SCHEMA public;
-        GRANT ALL ON SCHEMA public TO public;
-      `);
+      // const dropRes = await this.runQuery(`
+      //   DROP SCHEMA public CASCADE;
+      //   CREATE SCHEMA public;
+      //   GRANT ALL ON SCHEMA public TO public;
+      // `);
 
-      console.log({ dropRes });
+      // console.log({ dropRes });
 
       const init = await this.runQuery(`
         CREATE TABLE IF NOT EXISTS users (
@@ -37,15 +37,19 @@ export class DBService implements OnModuleInit {
         CREATE TABLE IF NOT EXISTS solutions (
           id SERIAL PRIMARY KEY,
           user_id INT REFERENCES users(id),
-          fitness NUMERIC,
+          fitness DOUBLE PRECISION,
           created_at TIMESTAMP DEFAULT NOW()
         );
 
         CREATE TABLE IF NOT EXISTS points (
             id SERIAL PRIMARY KEY,
+            domain_id INT,
             solution_id INT REFERENCES solutions(id),
-            lat NUMERIC,
-            lng NUMERIC,
+            lat DOUBLE PRECISION,
+            lng DOUBLE PRECISION,
+            isBase BOOLEAN,
+            isStartBase BOOLEAN,
+            label text,
             sequence_number INT,
             created_at TIMESTAMP DEFAULT NOW()
         );
@@ -53,12 +57,12 @@ export class DBService implements OnModuleInit {
         CREATE TABLE IF NOT EXISTS experiments (
           id SERIAL PRIMARY KEY,
           user_id INT REFERENCES users(id),
-          numberOfPoints NUMERIC,
-          numberOfRuns NUMERIC,
+          numberOfPoints INT,
+          numberOfRuns INT,
           algorithm VARCHAR(4),
           params JSONB,
-          mean NUMERIC,
-          standardDeviation NUMERIC,
+          mean DOUBLE PRECISION,
+          standardDeviation DOUBLE PRECISION,
           created_at TIMESTAMP DEFAULT NOW()
         );
 
@@ -85,13 +89,13 @@ export class DBService implements OnModuleInit {
     }
   }
 
-  async runQuery(query: string) {
+  async runQuery(query: string, values?: unknown[]) {
     const client = await this.pool.connect();
     let res;
     try {
       await client.query('BEGIN');
       try {
-        res = await client.query(query);
+        res = await client.query(query, values);
         await client.query('COMMIT');
       } catch (err) {
         await client.query('ROLLBACK');

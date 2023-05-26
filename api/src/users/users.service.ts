@@ -5,7 +5,7 @@ import { Role } from 'src/users/role.enum';
 export interface User {
   username: string;
   password: string;
-  id: string;
+  id: number;
   roles: Role[];
 }
 
