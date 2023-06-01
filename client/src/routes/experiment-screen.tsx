@@ -16,98 +16,100 @@ const ExperimentScreen_ = observer(() => {
   const bloc = useMemo(() => new ExperimentScreenBLoC(), []);
 
   return (
-    <div>
-      <div className="row withLeftMargin withBottomMargin">
-        <Input
-          className="withRightMargin"
-          label="Number of points:"
-          onChange={bloc.setNumberOfPoints}
-          value={bloc.formData.numberOfPoints}
-        />
+    <div className="nonCenteredRow">
+      <div>
+        <div className="row withLeftMargin withBottomMargin">
+          <Input
+            className="withRightMargin"
+            label="Number of points:"
+            onChange={bloc.setNumberOfPoints}
+            value={bloc.formData.numberOfPoints}
+          />
 
-        <Input
-          className="withRightMargin"
-          label="Number of runs:"
-          onChange={bloc.setNumberOfRuns}
-          value={bloc.formData.numberOfRuns}
-        />
+          <Input
+            className="withRightMargin"
+            label="Number of runs:"
+            onChange={bloc.setNumberOfRuns}
+            value={bloc.formData.numberOfRuns}
+          />
 
-        <Dropdown
-          onChange={bloc.setAlgorithm}
-          options={ALGORITHMS}
-          value={bloc.formData.algorithm}
-          label="Algorithm:"
-        />
+          <Dropdown
+            onChange={bloc.setAlgorithm}
+            options={ALGORITHMS}
+            value={bloc.formData.algorithm}
+            label="Algorithm:"
+          />
+        </div>
+
+        <div className="withLeftMargin">
+          {bloc.formData.algorithm === "tabu" && (
+            <TabuParamsForm
+              value={bloc.algoParamsFormData.tabu}
+              setters={bloc.tabuParamsSetters}
+            />
+          )}
+
+          {bloc.formData.algorithm === "ants" && (
+            <AntsParamsForm
+              value={bloc.algoParamsFormData.ants}
+              setters={bloc.antsParamsSetters}
+            />
+          )}
+
+          {bloc.formData.algorithm === "bees" && (
+            <BeesParamsForm
+              value={bloc.algoParamsFormData.bees}
+              setters={bloc.beesParamsSetters}
+            />
+          )}
+
+          <Button className="withTopMargin" onClick={bloc.submit}>
+            Submit
+          </Button>
+
+          <Button
+            className="withTopMargin"
+            onClick={bloc.downloadLastExperimentResult}
+          >
+            ⇩ Download last experiment result
+          </Button>
+
+          {bloc.experimentResultsPrematureDownloadTry && (
+            <div className="errorMsg withLeftMargin withTopMargin">
+              {bloc.PREMATURE_DOWNLOAD_ERROR}
+            </div>
+          )}
+        </div>
       </div>
 
-      <div className="withLeftMargin">
-        {bloc.formData.algorithm === "tabu" && (
-          <TabuParamsForm
-            value={bloc.algoParamsFormData.tabu}
-            setters={bloc.tabuParamsSetters}
-          />
-        )}
+      <div className="nonCenteredRow withTopMargin allExperimentResultsContainer">
+        <div className="experimentResultsContainer fitContent">
+          <div className="withBottomMargin">RESULTS:</div>
 
-        {bloc.formData.algorithm === "ants" && (
-          <AntsParamsForm
-            value={bloc.algoParamsFormData.ants}
-            setters={bloc.antsParamsSetters}
-          />
-        )}
+          <div>Best time:</div>
+          <div>{bloc.bestFitness}</div>
 
-        {bloc.formData.algorithm === "bees" && (
-          <BeesParamsForm
-            value={bloc.algoParamsFormData.bees}
-            setters={bloc.beesParamsSetters}
-          />
-        )}
+          <div className="withTopMargin">Mean time:</div>
+          <div>{bloc.meanFitness}</div>
 
-        <Button className="withTopMargin" onClick={bloc.submit}>
-          Submit
-        </Button>
+          <div className="withTopMargin">{`Time median${
+            isNumber(bloc.madianFitness) ? "" : "s"
+          }:`}</div>
+          <div>{bloc.medianFitnessString}</div>
 
-        <Button
-          className="withTopMargin"
-          onClick={bloc.downloadLastExperimentResult}
-        >
-          ⇩ Download last experiment result
-        </Button>
+          <div className="withTopMargin">Standart deviation:</div>
+          <div>{bloc.standardDeviation}</div>
+        </div>
 
-        {bloc.experimentResultsPrematureDownloadTry && (
-          <div className="errorMsg withLeftMargin withTopMargin">
-            {bloc.PREMATURE_DOWNLOAD_ERROR}
-          </div>
-        )}
-
-        <div className="nonCenteredRow withTopMargin">
-          <div className="experimentResultsContainer fitContent">
-            <div className="withBottomMargin">RESULTS:</div>
-
-            <div>Best time:</div>
-            <div>{bloc.bestFitness}</div>
-
-            <div className="withTopMargin">Mean time:</div>
-            <div>{bloc.meanFitness}</div>
-
-            <div className="withTopMargin">{`Time median${
-              isNumber(bloc.madianFitness) ? "" : "s"
-            }:`}</div>
-            <div>{bloc.medianFitnessString}</div>
-
-            <div className="withTopMargin">Standart deviation:</div>
-            <div>{bloc.standardDeviation}</div>
-          </div>
-
-          <div className="withLeftMargin">
-            <div className="withTopMargin ">Total time (min):</div>
-            {bloc.fitnesses.map((fitness, i) => (
-              <>
-                <span>{`Run №${i + 1}: `}</span>
-                <span>{fitness}</span>
-                <br />
-              </>
-            ))}
-          </div>
+        <div className="withLeftMargin">
+          <div>Total time (min):</div>
+          {bloc.fitnesses.map((fitness, i) => (
+            <>
+              <span>{`Run №${i + 1}: `}</span>
+              <span>{fitness}</span>
+              <br />
+            </>
+          ))}
         </div>
       </div>
     </div>

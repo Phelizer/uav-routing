@@ -5,3 +5,8 @@
     border-color: black;
     border-style: solid;
 }
+
+.allExperimentResultsContainer {
+    width: 30vw;
+    margin-left: 10vw;
+}
