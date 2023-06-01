@@ -38,7 +38,7 @@ export const SignupScreen = observer(() => {
       </div>
 
       <Button
-        className="shrinkCustomButtonAmendments withTopMargin"
+        className="shrinkCustomButtonAmendments withTinyTopMargin"
         type="submit"
         onClick={submit}
       >
