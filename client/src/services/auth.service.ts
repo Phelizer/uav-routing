@@ -27,15 +27,21 @@ export class AuthService {
   private saveLoginDataLocally(access_token: string, roles: Role[]) {
     runInAction(() => {
       Cookies.set(CookieKeys.accessToken, access_token);
+      this.setRoles(roles);
       appStateStoreInstance.isLoggedIn = true;
-      appStateStoreInstance.roles = roles;
     });
   }
 
   @action
   logout = () => {
     Cookies.remove(CookieKeys.accessToken);
+    Cookies.remove(CookieKeys.roles);
     appStateStoreInstance.isLoggedIn = false;
     appStateStoreInstance.roles = [];
+  };
+
+  setRoles = (roles: Role[]) => {
+    Cookies.set(CookieKeys.roles, JSON.stringify(roles));
+    appStateStoreInstance.roles = roles;
   };
 }

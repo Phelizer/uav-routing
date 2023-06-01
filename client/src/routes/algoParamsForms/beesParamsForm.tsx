@@ -12,21 +12,20 @@ export const BeesParamsForm = ({
       {() => (
         <div>
           <Input
-            className="withRightMargin"
+            className="withBottomMargin"
             label="Solution population size:"
             onChange={setters.solutionPopulationSize}
             value={value.solutionPopulationSize}
           />
 
           <Input
-            className="withRightMargin"
+            className="withBottomMargin"
             label="Number of best solutions:"
             onChange={setters.numberOfBestSolutions}
             value={value.numberOfBestSolutions}
           />
 
           <Input
-            className="withRightMargin"
             label="Max iterations without improvement:"
             onChange={setters.maxOfIterWithoutImpr}
             value={value.maxOfIterWithoutImpr}

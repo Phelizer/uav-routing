@@ -10,6 +10,7 @@ import { researcherOnly } from "../researcherOnly";
 import { TabuParamsForm } from "./algoParamsForms/tabuParamsForm";
 import { AntsParamsForm } from "./algoParamsForms/antsParamsForm";
 import { BeesParamsForm } from "./algoParamsForms/beesParamsForm";
+import { Button } from "../components/Button";
 
 const ExperimentScreen_ = observer(() => {
   const bloc = useMemo(() => new ExperimentScreenBLoC(), []);
@@ -37,7 +38,9 @@ const ExperimentScreen_ = observer(() => {
           value={bloc.formData.algorithm}
           label="Algorithm:"
         />
+      </div>
 
+      <div className="withLeftMargin">
         {bloc.formData.algorithm === "tabu" && (
           <TabuParamsForm
             value={bloc.algoParamsFormData.tabu}
@@ -59,45 +62,53 @@ const ExperimentScreen_ = observer(() => {
           />
         )}
 
-        <button
-          className="withLeftMargin"
+        <Button className="withTopMargin" onClick={bloc.submit}>
+          Submit
+        </Button>
+
+        <Button
+          className="withTopMargin"
           onClick={bloc.downloadLastExperimentResult}
         >
-          Download last experiment result
-        </button>
+          ⇩ Download last experiment result
+        </Button>
 
         {bloc.experimentResultsPrematureDownloadTry && (
-          <div className="errorMsg withLeftMargin withBottomMargin">
+          <div className="errorMsg withLeftMargin withTopMargin">
             {bloc.PREMATURE_DOWNLOAD_ERROR}
           </div>
         )}
 
-        <button onClick={bloc.submit}>Submit</button>
-      </div>
+        <div className="nonCenteredRow withTopMargin">
+          <div className="experimentResultsContainer fitContent">
+            <div className="withBottomMargin">RESULTS:</div>
 
-      <div>Total time (min):</div>
-      <div>
-        {bloc.fitnesses.map((fitness, i) => (
-          <>
-            <span>{`Run №${i + 1}: `}</span>
-            <span>{fitness}</span>
-            <br />
-          </>
-        ))}
+            <div>Best time:</div>
+            <div>{bloc.bestFitness}</div>
 
-        <div className="withTopMargin">Best time:</div>
-        <div>{bloc.bestFitness}</div>
+            <div className="withTopMargin">Mean time:</div>
+            <div>{bloc.meanFitness}</div>
 
-        <div className="withTopMargin">Mean time:</div>
-        <div>{bloc.meanFitness}</div>
+            <div className="withTopMargin">{`Time median${
+              isNumber(bloc.madianFitness) ? "" : "s"
+            }:`}</div>
+            <div>{bloc.medianFitnessString}</div>
 
-        <div className="withTopMargin">{`Time median${
-          isNumber(bloc.madianFitness) ? "" : "s"
-        }:`}</div>
-        <div>{bloc.medianFitnessString}</div>
+            <div className="withTopMargin">Standart deviation:</div>
+            <div>{bloc.standardDeviation}</div>
+          </div>
 
-        <div className="withTopMargin">Standart deviation:</div>
-        <div>{bloc.standardDeviation}</div>
+          <div className="withLeftMargin">
+            <div className="withTopMargin ">Total time (min):</div>
+            {bloc.fitnesses.map((fitness, i) => (
+              <>
+                <span>{`Run №${i + 1}: `}</span>
+                <span>{fitness}</span>
+                <br />
+              </>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );

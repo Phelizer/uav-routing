@@ -1,32 +1,6 @@
-.row {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-}
-
-.withRightMargin {
-    margin-right: 5vw;
-}
-
-.withLeftMargin {
-    margin-left: 1vw;
-}
-
-.withBottomMargin {
-    margin-bottom: 3vh;
-}
-
 .canv {
     background-color: lavender;
     display: flex;
-}
-
-.withTopMargin {
-    margin-top: 2vh;
-}
-
-.withBottomMargin {
-    margin-bottom: 2vh;
 }
 
 .canvContainer {
@@ -39,11 +13,6 @@
     margin-left: 5vw;
     margin-right: 5vw;
     margin-bottom: 5vw;
-}
-
-.errorMsg {
-    color: red;
-    font-size: small;
 }
 
 .map-container {

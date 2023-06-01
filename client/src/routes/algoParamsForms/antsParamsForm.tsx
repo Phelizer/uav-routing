@@ -12,35 +12,34 @@ export const AntsParamsForm = ({
       {() => (
         <div>
           <Input
-            className="withRightMargin"
+            className="withBottomMargin"
             label="Number of ants:"
             onChange={setters.antsNumber}
             value={value.antsNumber}
           />
 
           <Input
-            className="withRightMargin"
+            className="withBottomMargin"
             label="Evaporations rate:"
             onChange={setters.evaporationRate}
             value={value.evaporationRate}
           />
 
           <Input
-            className="withRightMargin"
+            className="withBottomMargin"
             label="Heuristic information importance:"
             onChange={setters.heurInfoImportance}
             value={value.heurInfoImportance}
           />
 
           <Input
-            className="withRightMargin"
+            className="withBottomMargin"
             label="Pheromone importance:"
             onChange={setters.pheromoneImportance}
             value={value.pheromoneImportance}
           />
 
           <Input
-            className="withRightMargin"
             label="Max iterations without improvement:"
             onChange={setters.maxIterationsWithoutImprovement}
             value={value.maxIterationsWithoutImprovement}

@@ -211,6 +211,10 @@ export class ExperimentScreenBLoC {
 
   @computed
   get bestFitness() {
+    if (this.fitnesses.length === 0) {
+      return 0;
+    }
+
     return this.fitnesses.reduce((best, x) => (x < best ? x : best), Infinity);
   }
 

@@ -3,6 +3,7 @@ import "./NavBar.css";
 import { observer } from "mobx-react-lite";
 import { useMemo } from "react";
 import { NavBarBLoC } from "./NavBar.bloc";
+import { Button } from "./Button";
 
 export const NavBar = observer(() => {
   const bloc = useMemo(() => new NavBarBLoC(), []);
@@ -22,9 +23,7 @@ export const NavBar = observer(() => {
         </ul>
       </nav>
 
-      <button className="logout-button" onClick={bloc.logOutHandler}>
-        Log out
-      </button>
+      <Button onClick={bloc.logOutHandler}>Log out</Button>
 
       {!bloc.isLoggedIn && <Navigate to={"/"} />}
     </div>

@@ -12,21 +12,20 @@ export const TabuParamsForm = ({
       {() => (
         <div>
           <Input
-            className="withRightMargin"
-            label="Number of runs:"
+            className="withBottomMargin"
+            label="Number of tabu searches:"
             onChange={setters.numOfRuns}
             value={value.numOfRuns}
           />
 
           <Input
-            className="withRightMargin"
+            className="withBottomMargin"
             label="Tabu Tenure:"
             onChange={setters.tabuTenure}
             value={value.tabuTenure}
           />
 
           <Input
-            className="withRightMargin"
             label="Max iterations without improvement:"
             onChange={setters.maxIterationsWithoutImprovement}
             value={value.maxIterationsWithoutImprovement}

@@ -25,7 +25,7 @@ export class DBService implements OnModuleInit {
 
       // console.log({ dropRes });
 
-      const init = await this.runQuery(`
+      await this.runQuery(`
         CREATE TABLE IF NOT EXISTS users (
           id SERIAL PRIMARY KEY,
           username VARCHAR(50) NOT NULL,
@@ -67,22 +67,18 @@ export class DBService implements OnModuleInit {
         );
 
       `);
-      console.log({ init });
 
-      const initUsers = await this.runQuery(`
+      await this.runQuery(`
         INSERT INTO users (username, password, roles)
         VALUES ('researcher', '1111', ARRAY['researcher']), ('user', '1111', ARRAY['user']);
       `);
 
-      console.log({ initUsers });
-
-      const sdf2 = await this.runQuery(`
+      await this.runQuery(`
         SELECT table_name
         FROM information_schema.tables
         WHERE table_schema = 'public'
         ORDER BY table_name;
       `);
-      console.log({ sdf2: sdf2.rows });
       console.log('Connected to the database.');
     } catch (err) {
       console.error('Error connecting to the database.', err);

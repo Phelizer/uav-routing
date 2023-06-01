@@ -1,3 +1,7 @@
-.withTopMargin {
-    margin-top: 1vh;
+.experimentResultsContainer {
+    padding: 20px;
+    border-radius: 6px;
+    border-width: 1px;
+    border-color: black;
+    border-style: solid;
 }

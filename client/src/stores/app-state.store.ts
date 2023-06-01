@@ -8,7 +8,9 @@ class AppStateStore {
   isLoggedIn = !!Cookies.get(CookieKeys.accessToken);
 
   @observable
-  roles: Role[] = [];
+  roles: Role[] = Cookies.get(CookieKeys.roles)
+    ? (JSON.parse(Cookies.get(CookieKeys.roles) as any) as Role[])
+    : [];
 
   constructor() {
     makeObservable(this);

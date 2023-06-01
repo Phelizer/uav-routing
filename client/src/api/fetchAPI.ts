@@ -12,6 +12,7 @@ export async function fetchAPI<Result>(
   const response = await fetch(url, options);
   if (response.status === 401) {
     Cookies.remove(CookieKeys.accessToken);
+    Cookies.remove(CookieKeys.roles);
     // TODO: add a toast or something that notifies user that his session has expired
     window.location.reload();
   }

@@ -24,9 +24,9 @@ export function GoogleMapsVisualization({ route, delay }: MapProps) {
 
     const bounds = new google.maps.LatLngBounds();
     route.forEach(({ lat, lng }) => {
-      console.log({ bounds });
       bounds.extend({ lat, lng });
     });
+
     map.fitBounds(bounds);
 
     const timeouts: NodeJS.Timeout[] = [];

@@ -1,0 +1,21 @@
+.CustomButton {
+    color: white;
+    background-color: #007bff;
+    border: none;
+    border-radius: 2px;
+    padding: 10px 20px;
+    margin-top: 20px;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    transition-duration: 0.3s;
+    height: 44px
+}
+
+.CustomButton:hover {
+    background-color: #008CBA;
+    color: white;
+}
