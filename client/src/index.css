@@ -34,7 +34,7 @@ body {
 }
 
 .withLeftMargin {
-  margin-left: 1vw;
+  margin-left: 1vw !important;
 }
 
 .withBottomMargin {

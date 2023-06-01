@@ -1,1 +1,1 @@
-{"algorithm":"tabu","mean":86.44,"standardDeviation":0,"numberOfPoints":20,"numberOfRuns":1,"params":{"numOfRuns":100,"tabuTenure":100,"maxIterationsWithoutImprovement":50}}
+{"algorithm":"tabu","mean":49.98,"standardDeviation":5.7,"numberOfPoints":10,"numberOfRuns":10,"params":{"numOfRuns":30,"tabuTenure":100,"maxIterationsWithoutImprovement":10}}
