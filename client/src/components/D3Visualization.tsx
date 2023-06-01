@@ -23,8 +23,8 @@ export function D3Visualization({
   yOffsetInCoordinates = 0,
 }: PointComponentProps) {
   const d3Container = useRef(null);
-  const [width, setWidth] = useState(window.innerWidth * 0.8);
-  const [height, setHeight] = useState(window.innerHeight * 0.8);
+  const [width, setWidth] = useState(window.innerWidth * 0.5);
+  const [height, setHeight] = useState(window.innerHeight * 0.75);
 
   const handleResize = () => {
     setWidth(window.innerWidth * 0.8);

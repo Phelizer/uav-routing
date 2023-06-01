@@ -72,11 +72,15 @@ export function GoogleMapsVisualization({ route, delay }: MapProps) {
                   height: "350",
                   borderWidth: "5px",
                   borderColor: "black",
+                  borderRadius: "50px",
                 }}
               >
                 <GoogleMap
                   mapContainerClassName="map-container"
-                  mapContainerStyle={{ height: "100vh", width: "100vw" }}
+                  mapContainerStyle={{
+                    height: "80vh",
+                    width: "52vw",
+                  }}
                   onLoad={onLoad}
                 >
                   {route.map((point, i) => (
