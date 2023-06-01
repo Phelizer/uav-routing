@@ -3,30 +3,37 @@ import { Input } from "../components/input";
 import { loginScreenBLoCInstance as bloc } from "./login-screen.bloc";
 import { useWithPreventedDefault } from "../utils/useWithPreventedDefault";
 import { Link } from "react-router-dom";
+import { Button } from "../components/Button";
 
 export const LoginScreen = observer(() => {
-  const onSubmit = useWithPreventedDefault(bloc.submitForm);
+  const submit = useWithPreventedDefault(bloc.submitForm);
 
   return (
-    <div>
-      <form onSubmit={onSubmit}>
-        <Input
-          label="username"
-          value={bloc.formData.username}
-          onChange={bloc.setUsername}
-        />
+    <div className="authContainer">
+      <Input
+        label="username"
+        value={bloc.formData.username}
+        onChange={bloc.setUsername}
+      />
 
-        <Input
-          label="password"
-          value={bloc.formData.password}
-          onChange={bloc.setPassword}
-          type="password"
-        />
+      <Input
+        className="withTinyTopMargin"
+        label="password"
+        value={bloc.formData.password}
+        onChange={bloc.setPassword}
+        type="password"
+      />
 
-        <button type="submit">Log in</button>
-      </form>
+      <Button
+        className="shrinkCustomButtonAmendments withTopMargin"
+        onClick={submit}
+      >
+        Log in
+      </Button>
 
-      <Link to="/signup">Create account</Link>
+      <div className="withTopMargin">
+        <Link to="/signup">Need account?</Link>
+      </div>
     </div>
   );
 });

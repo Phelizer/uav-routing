@@ -6,45 +6,56 @@ import { signupScreenBLoCInstance as bloc } from "./signup-screen.bloc";
 import { ROLES } from "../models";
 import "./signup-screen.css";
 import { Link, Navigate } from "react-router-dom";
+import { Button } from "../components/Button";
 
 export const SignupScreen = observer(() => {
-  const onSubmit = useWithPreventedDefault(bloc.submitForm);
+  const submit = useWithPreventedDefault(bloc.submitForm);
 
   return (
-    <div>
-      <form onSubmit={onSubmit}>
-        <Input
-          label="username"
-          value={bloc.formData.username}
-          onChange={bloc.setUsername}
-        />
+    <div className="authContainer">
+      <Input
+        label="username"
+        value={bloc.formData.username}
+        onChange={bloc.setUsername}
+      />
 
-        <Input
-          label="password"
-          value={bloc.formData.password}
-          onChange={bloc.setPassword}
-          type="password"
-        />
+      <Input
+        className="withTinyTopMargin"
+        label="password"
+        value={bloc.formData.password}
+        onChange={bloc.setPassword}
+        type="password"
+      />
 
+      <div className="withTinyTopMargin">
         <Dropdown
-          label="Role"
+          className="standartInputWidth"
+          label="role"
           value={bloc.formData.role}
           onChange={bloc.setRole}
           options={ROLES}
         />
+      </div>
 
-        <button type="submit">Sign up</button>
+      <Button
+        className="shrinkCustomButtonAmendments withTopMargin"
+        type="submit"
+        onClick={submit}
+      >
+        Sign up
+      </Button>
 
-        {!!bloc.errorMsg && (
-          <div className="errorMsg withLeftMargin withTopMargin">
-            {bloc.errorMsg}
-          </div>
-        )}
+      {!!bloc.errorMsg && (
+        <div className="errorMsg withLeftMargin withTinyTopMargin">
+          {bloc.errorMsg}
+        </div>
+      )}
 
-        {bloc.signedupSuccessfully && <Navigate to={"/"} />}
+      {bloc.signedupSuccessfully && <Navigate to={"/"} />}
 
+      <div className="withTopMargin">
         <Link to="/">Already have account?</Link>
-      </form>
+      </div>
     </div>
   );
 });

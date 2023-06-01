@@ -1,13 +1,4 @@
-
-.errorMsg {
-    color: red;
-    font-size: small;
-}
-
-.withLeftMargin {
-    margin-left: 1vw;
-}
-
-.withTopMargin {
-    margin-top: 2vh;
+.standartInputWidth {
+    width: 150px;
+    margin-bottom: 10px;
 }

@@ -49,12 +49,12 @@ export const SolverScreen = observer(() => {
             </div>
           </Fragment>
         ))}
-        <button
-          className="CustomButton shrinkCustomButtonAmendments withLeftMargin withBottomMargin withTinyTopMargin"
+        <Button
+          className="shrinkCustomButtonAmendments withLeftMargin withBottomMargin withTinyTopMargin"
           onClick={bloc.addPoint}
         >
           + Add point
-        </button>
+        </Button>
         <div className="withLeftMargin">Start base:</div>
         <div className="row withLeftMargin withBottomMargin">
           <Input
