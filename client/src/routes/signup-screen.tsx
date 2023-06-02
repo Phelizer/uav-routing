@@ -17,6 +17,7 @@ export const SignupScreen = observer(() => {
         label="username"
         value={bloc.formData.username}
         onChange={bloc.setUsername}
+        error={(bloc.errors as any)?.username?.[0]}
       />
 
       <Input
@@ -25,6 +26,7 @@ export const SignupScreen = observer(() => {
         value={bloc.formData.password}
         onChange={bloc.setPassword}
         type="password"
+        error={(bloc.errors as any)?.password?.[0]}
       />
 
       <div className="withTinyTopMargin">

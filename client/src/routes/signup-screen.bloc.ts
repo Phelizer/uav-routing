@@ -1,7 +1,20 @@
-import { action, makeObservable, observable, runInAction } from "mobx";
+import {
+  action,
+  computed,
+  makeObservable,
+  observable,
+  runInAction,
+} from "mobx";
 import { AuthService } from "../services/auth.service";
 import { Role } from "../models";
 import * as R from "ramda";
+import {
+  isFormValid,
+  isPresent,
+  isRequiredErrorMsg,
+  replaceXWithYARecursively,
+} from "../utils/utils";
+import spected, { SpecObject } from "spected";
 
 interface SignupFormData {
   username: string;
@@ -15,6 +28,19 @@ class SignupScreenBLoC {
   constructor() {
     makeObservable(this);
   }
+
+  @computed
+  get errors() {
+    const errors = replaceXWithYARecursively(
+      (v: unknown): v is true => v === true,
+      []
+    )(this.lastValidationResult);
+
+    return errors;
+  }
+
+  @observable
+  private lastValidationResult: Record<string, unknown> = {};
 
   @observable
   signedupSuccessfully = false;
@@ -46,7 +72,24 @@ class SignupScreenBLoC {
     this.formData.role = value;
   };
 
+  private spec: SpecObject<Exclude<SignupFormData, "role">> = {
+    username: [[isPresent, isRequiredErrorMsg("Username")]],
+    password: [[isPresent, isRequiredErrorMsg("Passsword")]],
+  };
+
+  @action
+  private validate() {
+    const res = spected(this.spec, this.formData);
+    this.lastValidationResult = res;
+    return isFormValid(res as any);
+  }
+
   submitForm = async () => {
+    const isValid = this.validate();
+    if (!isValid) {
+      return;
+    }
+
     const signupData = {
       username: this.formData.username,
       password: this.formData.password,
