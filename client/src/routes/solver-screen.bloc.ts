@@ -326,8 +326,10 @@ export class SolverScreenBLoC {
 
     const startBase = this.parsePointData(this.formData.startBase);
     const anotherBase = this.parsePointData(this.formData.anotherBase);
-    const chargeTime = parseFloat(this.formData.chargeTime);
-    const speed = parseFloat(this.formData.speed) * this.MIN_TO_MILLISEC;
+    const chargeTime =
+      parseFloat(this.formData.chargeTime) * this.MIN_TO_MILLISEC;
+
+    const speed = parseFloat(this.formData.speed);
     const maxFlightTime =
       parseFloat(this.formData.maxFlightTime) * this.MIN_TO_MILLISEC;
 

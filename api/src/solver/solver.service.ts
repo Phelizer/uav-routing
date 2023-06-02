@@ -71,14 +71,35 @@ export class SolverService {
       speed,
     } = inputData;
 
-    // const { points, bases }: { points: Point[]; bases: [Point, Point] } =
-    //   JSON.parse(fs.readFileSync(__dirname + '/../../coords.json').toString());
-    // const shuffledPoints = randomlyReplaceArrayElements(points);
-    // const [startBase2, anotherBase2] = bases;
-    // const maxFlightTime2: Milliseconds = 120000;
-    // const speed2: KilometersPeHour = 30;
-    // const chargeTime2 = 60000;
-    // console.time('algorithm time');
+    const { points, bases }: { points: Point[]; bases: [Point, Point] } =
+      JSON.parse(fs.readFileSync(__dirname + '/../../coords.json').toString());
+    const shuffledPoints = randomlyReplaceArrayElements(points);
+    const [startBase2, anotherBase2] = bases;
+    const maxFlightTime2: Milliseconds = 120000;
+    const speed2: KilometersPeHour = 30;
+    const chargeTime2 = 60000;
+    console.time('algorithm time');
+
+    console.log('=============');
+    console.log({
+      shuffledPoints,
+      startBase2,
+      anotherBase2,
+      chargeTime2,
+      maxFlightTime2,
+      speed2,
+    });
+    console.log('=============');
+    console.log('=============');
+    console.log({
+      pointsToObserve,
+      startBase,
+      anotherBase,
+      chargeTime,
+      maxFlightTime,
+      speed,
+    });
+    console.log('=============');
     // const solution = this.solver(
     //   shuffledPoints,
     //   startBase2,
