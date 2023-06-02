@@ -36,6 +36,7 @@ export const SolverScreen = observer(() => {
                 label="Latitude"
                 onChange={bloc.createPointSetter(i, "lat")}
                 value={bloc.formData.points[i].lat.toString()}
+                error={(bloc.errors?.points as any)?.[`${i}`]?.lat?.[0]}
               />
 
               <Input
@@ -43,6 +44,7 @@ export const SolverScreen = observer(() => {
                 label="Longitude"
                 onChange={bloc.createPointSetter(i, "lng")}
                 value={bloc.formData.points[i].lng.toString()}
+                error={(bloc.errors?.points as any)?.[`${i}`]?.lng?.[0]}
               />
 
               <div>Label: {pointData.label}</div>
@@ -62,6 +64,7 @@ export const SolverScreen = observer(() => {
             label="Latitude"
             onChange={bloc.setStartBaseLat}
             value={bloc.formData.startBase.lat}
+            error={(bloc.errors?.startBase as any)?.lat?.[0]}
           />
 
           <Input
@@ -69,6 +72,7 @@ export const SolverScreen = observer(() => {
             label="Longitude"
             onChange={bloc.setStartBaseLng}
             value={bloc.formData.startBase.lng}
+            error={(bloc.errors?.startBase as any)?.lng?.[0]}
           />
 
           <div>Label: Base 1</div>
@@ -80,6 +84,7 @@ export const SolverScreen = observer(() => {
             label="Latitude"
             onChange={bloc.setAnotherBaseLat}
             value={bloc.formData.anotherBase.lat}
+            error={(bloc.errors?.anotherBase as any)?.lat?.[0]}
           />
 
           <Input
@@ -87,6 +92,7 @@ export const SolverScreen = observer(() => {
             label="Longitude"
             onChange={bloc.setAnotherBaseLng}
             value={bloc.formData.anotherBase.lng}
+            error={(bloc.errors?.anotherBase as any)?.lng?.[0]}
           />
 
           <div>Label: Base 2</div>
@@ -97,21 +103,21 @@ export const SolverScreen = observer(() => {
             label="Charge time (min):"
             onChange={bloc.setChargeTime}
             value={bloc.formData.chargeTime}
-            error={bloc.errors.chargeTime[0]}
+            error={(bloc.errors?.chargeTime as any)?.[0]}
           />
           <Input
             className="withRightMargin"
             label="Max flight time (min):"
             onChange={bloc.setMaxFlightTime}
             value={bloc.formData.maxFlightTime}
-            error={bloc.errors.maxFlightTime[0]}
+            error={(bloc.errors?.maxFlightTime as any)?.[0]}
           />
           <Input
             className="withRightMargin"
             label="Speed (km/h):"
             onChange={bloc.setSpeed}
             value={bloc.formData.speed}
-            error={bloc.errors.speed[0]}
+            error={(bloc.errors?.speed as any)?.[0]}
           />
         </div>
 

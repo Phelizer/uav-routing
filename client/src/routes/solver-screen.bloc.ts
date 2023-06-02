@@ -13,8 +13,10 @@ import * as R from "ramda";
 import spected, { SpecObject } from "spected";
 import {
   isPresent,
+  isRecord,
   isRequiredErrorMsg,
-  isStringifiedFload,
+  isStringifiedFloat,
+  shouldBeNumberErrorMsg,
 } from "../utils/utils";
 // import { array, boolean, number, object, string } from "yup";
 
@@ -49,18 +51,32 @@ type StringFieldsOfInputDataForm = {
 type VisualizationType = "googlemaps" | "d3";
 
 export class SolverScreenBLoC {
+  private readonly pointValidationRules: SpecObject<Coords> = {
+    lat: [
+      [isPresent, isRequiredErrorMsg("Latitude")],
+      [isStringifiedFloat, shouldBeNumberErrorMsg("Latitude")],
+    ],
+    lng: [
+      [isPresent, isRequiredErrorMsg("Longitude")],
+      [isStringifiedFloat, shouldBeNumberErrorMsg("Longitude")],
+    ],
+  };
+
   private validationRules: SpecObject<InputDataForm> = {
+    points: R.map(() => this.pointValidationRules) as any,
+    startBase: this.pointValidationRules,
+    anotherBase: this.pointValidationRules,
     chargeTime: [
       [isPresent, isRequiredErrorMsg("Charge time")],
-      [isStringifiedFload, "Charge time must be a number"],
+      [isStringifiedFloat, shouldBeNumberErrorMsg("Charge time")],
     ],
     maxFlightTime: [
       [isPresent, isRequiredErrorMsg("Max flight time")],
-      [isStringifiedFload, "Max flight time must be a number"],
+      [isStringifiedFloat, shouldBeNumberErrorMsg("Max flight time")],
     ],
     speed: [
       [isPresent, isRequiredErrorMsg("Speed")],
-      [isStringifiedFload, "Speed must be a number"],
+      [isStringifiedFloat, shouldBeNumberErrorMsg("Speed")],
     ],
   };
 
@@ -69,14 +85,32 @@ export class SolverScreenBLoC {
     lng: "",
   };
 
-  @observable
-  errors: Record<string, string[]> = {
-    points: [],
-    startBase: [],
-    anotherBase: [],
-    chargeTime: [],
-    maxFlightTime: [],
-    speed: [],
+  @computed
+  get errors() {
+    const errors = this.replaceTrueWithEmptyArrayRecursively(
+      this.lastValidationResult
+    );
+
+    return errors;
+  }
+
+  private replaceTrueWithEmptyArrayRecursively = (
+    obj: Record<string, unknown>
+  ) => {
+    const clonedObj = R.clone(obj);
+
+    for (const key in clonedObj) {
+      const value = clonedObj[key];
+      if (value === true) {
+        clonedObj[key] = [];
+      }
+
+      if (isRecord(value)) {
+        this.replaceTrueWithEmptyArrayRecursively(value);
+      }
+    }
+
+    return clonedObj;
   };
 
   @observable
@@ -286,35 +320,30 @@ export class SolverScreenBLoC {
   setMaxFlightTime = this.createFormFieldSetter("maxFlightTime");
   setSpeed = this.createFormFieldSetter("speed");
 
-  private isFormValid(spectedValidationRes: Record<string, true | string[]>) {
+  private isFormValid(
+    spectedValidationRes: Record<string, true | string[]>
+  ): boolean {
+    let isValid = true;
     for (const key in spectedValidationRes) {
-      if (spectedValidationRes[key] !== true) {
-        return false;
+      if (Array.isArray(spectedValidationRes[key])) {
+        isValid &&= false;
+      }
+
+      if (isRecord(spectedValidationRes[key])) {
+        isValid &&= this.isFormValid(spectedValidationRes[key] as any);
       }
     }
 
-    return true;
+    return isValid;
   }
 
+  @observable
+  private lastValidationResult: Record<string, unknown> = {};
+
   @action
-  private writeErrors = (
-    spectedValidationRes: Record<string, true | string[]>
-  ) => {
-    for (const key in spectedValidationRes) {
-      const errorsOrTrue = spectedValidationRes[key];
-      if (Array.isArray(errorsOrTrue)) {
-        this.errors[key] = errorsOrTrue;
-      }
-
-      if (errorsOrTrue === true) {
-        this.errors[key] = [];
-      }
-    }
-  };
-
   private validate(data: InputDataForm) {
     const res = spected(this.validationRules, data);
-    this.writeErrors(res as any);
+    this.lastValidationResult = res;
     return this.isFormValid(res as any);
   }
 

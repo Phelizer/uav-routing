@@ -27,7 +27,7 @@ export const buildErrorMsg =
 export const isRequiredErrorMsg = buildErrorMsg("$1 is required");
 export const shouldBeNumberErrorMsg = buildErrorMsg("$1 should be a number");
 
-export function isStringifiedFload(value: unknown): boolean {
+export function isStringifiedFloat(value: unknown): boolean {
   return isString(value) && !isNaN(parseFloat(value));
 }
 
