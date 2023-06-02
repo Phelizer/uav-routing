@@ -24,6 +24,7 @@ const ExperimentScreen_ = observer(() => {
             label="Number of points:"
             onChange={bloc.setNumberOfPoints}
             value={bloc.formData.numberOfPoints}
+            error={(bloc.errors?.numberOfPoints as any)?.[0]}
           />
 
           <Input
@@ -31,6 +32,7 @@ const ExperimentScreen_ = observer(() => {
             label="Number of runs:"
             onChange={bloc.setNumberOfRuns}
             value={bloc.formData.numberOfRuns}
+            error={(bloc.errors?.numberOfRuns as any)?.[0]}
           />
 
           <Dropdown
@@ -46,6 +48,7 @@ const ExperimentScreen_ = observer(() => {
             <TabuParamsForm
               value={bloc.algoParamsFormData.tabu}
               setters={bloc.tabuParamsSetters}
+              errors={bloc.paramErrors as any}
             />
           )}
 
@@ -53,6 +56,7 @@ const ExperimentScreen_ = observer(() => {
             <AntsParamsForm
               value={bloc.algoParamsFormData.ants}
               setters={bloc.antsParamsSetters}
+              errors={bloc.paramErrors as any}
             />
           )}
 
@@ -60,6 +64,7 @@ const ExperimentScreen_ = observer(() => {
             <BeesParamsForm
               value={bloc.algoParamsFormData.bees}
               setters={bloc.beesParamsSetters}
+              errors={bloc.paramErrors as any}
             />
           )}
 

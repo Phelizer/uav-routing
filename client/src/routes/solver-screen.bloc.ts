@@ -12,14 +12,13 @@ import { saveAs } from "file-saver";
 import * as R from "ramda";
 import spected, { SpecObject } from "spected";
 import {
+  isFormValid,
   isPresent,
-  isRecord,
   isRequiredErrorMsg,
   isStringifiedFloat,
   replaceXWithYARecursively,
   shouldBeNumberErrorMsg,
 } from "../utils/utils";
-// import { array, boolean, number, object, string } from "yup";
 
 interface Coords {
   lat: string;
@@ -298,23 +297,6 @@ export class SolverScreenBLoC {
   setMaxFlightTime = this.createFormFieldSetter("maxFlightTime");
   setSpeed = this.createFormFieldSetter("speed");
 
-  private isFormValid(
-    spectedValidationRes: Record<string, true | string[]>
-  ): boolean {
-    let isValid = true;
-    for (const key in spectedValidationRes) {
-      if (Array.isArray(spectedValidationRes[key])) {
-        isValid &&= false;
-      }
-
-      if (isRecord(spectedValidationRes[key])) {
-        isValid &&= this.isFormValid(spectedValidationRes[key] as any);
-      }
-    }
-
-    return isValid;
-  }
-
   @observable
   private lastValidationResult: Record<string, unknown> = {};
 
@@ -322,7 +304,7 @@ export class SolverScreenBLoC {
   private validate(data: InputDataForm) {
     const res = spected(this.validationRules, data);
     this.lastValidationResult = res;
-    return this.isFormValid(res as any);
+    return isFormValid(res as any);
   }
 
   submitForm = async () => {

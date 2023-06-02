@@ -16,9 +16,20 @@ import {
 import { SolverService } from "../services/solver.service";
 import { PerformExperimentData } from "../api/solver/performExperimentAPI";
 import { solutionsStoreInstance } from "../stores/solutions.store";
-import { isNumber } from "../utils/utils";
+import {
+  isFormValid,
+  isNumber,
+  isPresent,
+  isRequiredErrorMsg,
+  isStringifiedFloat,
+  isStringifiedInt,
+  replaceXWithYARecursively,
+  shouldBeNaturalNumberErrorMsg,
+  shouldBeNumberErrorMsg,
+} from "../utils/utils";
 import { saveAs } from "file-saver";
 import * as R from "ramda";
+import spected, { SpecObject } from "spected";
 
 interface AlgoParamsFormData {
   tabu: TabuParameters;
@@ -37,6 +48,26 @@ export class ExperimentScreenBLoC {
 
   constructor() {
     makeObservable(this);
+  }
+
+  @computed
+  get errors() {
+    const errors = replaceXWithYARecursively(
+      (v: unknown): v is true => v === true,
+      []
+    )(this.lastValidationResult);
+
+    return errors;
+  }
+
+  @computed
+  get paramErrors() {
+    const errors = replaceXWithYARecursively(
+      (v: unknown): v is true => v === true,
+      []
+    )(this.lastParamValidationResult);
+
+    return errors;
   }
 
   private readonly INITIAL_TABU_PARAMS = {
@@ -123,7 +154,125 @@ export class ExperimentScreenBLoC {
     return objOfNum;
   }
 
+  private formSpec: SpecObject<ExperimentForm> = {
+    numberOfPoints: [
+      [isPresent, isRequiredErrorMsg("Number of points")],
+      [isStringifiedInt, shouldBeNaturalNumberErrorMsg("Number of points")],
+    ],
+    numberOfRuns: [
+      [isPresent, isRequiredErrorMsg("Number of runs")],
+      [isStringifiedInt, shouldBeNaturalNumberErrorMsg("Number of runs")],
+    ],
+  };
+
+  // eslint-disable-next-line getter-return
+  @computed
+  private get paramSpec() {
+    switch (this.formData.algorithm) {
+      case "tabu":
+        return this.tabuParamsSpec;
+      case "bees":
+        return this.beesParamsSpec;
+      case "ants":
+        return this.antParamsSpec;
+    }
+  }
+
+  private antParamsSpec: SpecObject<AntColonyParameters> = {
+    antsNumber: [
+      [isPresent, isRequiredErrorMsg("Number of ants")],
+      [isStringifiedInt, shouldBeNaturalNumberErrorMsg("Number of ants")],
+    ],
+    evaporationRate: [
+      [isPresent, isRequiredErrorMsg("Evaporation rate")],
+      [isStringifiedFloat, shouldBeNumberErrorMsg("Evaporation rate")],
+    ],
+    heurInfoImportance: [
+      [isPresent, isRequiredErrorMsg("Heur. info importance")],
+      [isStringifiedFloat, shouldBeNumberErrorMsg("Heur. info importance")],
+    ],
+    pheromoneImportance: [
+      [isPresent, isRequiredErrorMsg("Pheromone importance")],
+      [isStringifiedFloat, shouldBeNumberErrorMsg("Pheromone importance")],
+    ],
+    maxIterationsWithoutImprovement: [
+      [isPresent, isRequiredErrorMsg("Max iter. w/o improvement")],
+      [
+        isStringifiedInt,
+        shouldBeNaturalNumberErrorMsg("Max iter. w/o improvement"),
+      ],
+    ],
+  };
+
+  private tabuParamsSpec: SpecObject<TabuParameters> = {
+    tabuTenure: [
+      [isPresent, isRequiredErrorMsg("Tabu tenure")],
+      [isStringifiedInt, shouldBeNaturalNumberErrorMsg("Tabu tenure")],
+    ],
+    numOfRuns: [
+      [isPresent, isRequiredErrorMsg("Num. of tabu searches")],
+      [
+        isStringifiedInt,
+        shouldBeNaturalNumberErrorMsg("Num. of tabu searches"),
+      ],
+    ],
+    maxIterationsWithoutImprovement: [
+      [isPresent, isRequiredErrorMsg("Max iter. w/o improvement")],
+      [
+        isStringifiedInt,
+        shouldBeNaturalNumberErrorMsg("Max iter. w/o improvement"),
+      ],
+    ],
+  };
+
+  private beesParamsSpec: SpecObject<BeesAlgorithmParameters> = {
+    maxOfIterWithoutImpr: [
+      [isPresent, isRequiredErrorMsg("Max iter. w/o improvement")],
+      [
+        isStringifiedInt,
+        shouldBeNaturalNumberErrorMsg("Max iter. w/o improvement"),
+      ],
+    ],
+    numberOfBestSolutions: [
+      [isPresent, isRequiredErrorMsg("Num. of best solutions")],
+      [
+        isStringifiedInt,
+        shouldBeNaturalNumberErrorMsg("Num. of best solutions"),
+      ],
+    ],
+    solutionPopulationSize: [
+      [isPresent, isRequiredErrorMsg("Population size")],
+      [isStringifiedInt, shouldBeNaturalNumberErrorMsg("Population size")],
+    ],
+  };
+
+  @observable
+  private lastParamValidationResult: Record<string, unknown> = {};
+
+  @observable
+  private lastValidationResult: Record<string, unknown> = {};
+
+  @action
+  private validate() {
+    const res = spected(this.formSpec, this.formData);
+    const paramRes = spected(
+      this.paramSpec,
+      this.algoParamsFormData[this.formData.algorithm]
+    );
+
+    console.log({ res });
+    console.log({ paramRes });
+
+    this.lastValidationResult = res;
+    this.lastParamValidationResult = paramRes;
+    return isFormValid(res as any) && isFormValid(paramRes as any);
+  }
+
   submit = async () => {
+    if (!this.validate()) {
+      return;
+    }
+
     const data: PerformExperimentData = {
       algorithm: this.formData.algorithm,
       numberOfPoints: parseInt(this.formData.numberOfPoints),

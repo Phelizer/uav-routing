@@ -6,6 +6,7 @@ import { AlgorithmParamsFormProps } from "./AlgorithmParamsFormProps.model";
 export const BeesParamsForm = ({
   value,
   setters,
+  errors,
 }: AlgorithmParamsFormProps<BeesAlgorithmParameters>) => {
   return (
     <Observer>
@@ -16,6 +17,7 @@ export const BeesParamsForm = ({
             label="Solution population size:"
             onChange={setters.solutionPopulationSize}
             value={value.solutionPopulationSize}
+            error={errors?.solutionPopulationSize?.[0]}
           />
 
           <Input
@@ -23,12 +25,14 @@ export const BeesParamsForm = ({
             label="Number of best solutions:"
             onChange={setters.numberOfBestSolutions}
             value={value.numberOfBestSolutions}
+            error={errors?.numberOfBestSolutions?.[0]}
           />
 
           <Input
             label="Max iterations without improvement:"
             onChange={setters.maxOfIterWithoutImpr}
             value={value.maxOfIterWithoutImpr}
+            error={errors?.maxOfIterWithoutImpr?.[0]}
           />
         </div>
       )}

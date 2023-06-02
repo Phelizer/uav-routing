@@ -10,4 +10,5 @@ export interface AlgorithmParamsFormProps<
 > {
   value: T;
   setters: SettersOf<T>;
+  errors?: Record<keyof T, string[]>;
 }

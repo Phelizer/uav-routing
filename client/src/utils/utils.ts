@@ -28,13 +28,37 @@ export const buildErrorMsg =
 
 export const isRequiredErrorMsg = buildErrorMsg("$1 is required");
 export const shouldBeNumberErrorMsg = buildErrorMsg("$1 should be a number");
+export const shouldBeNaturalNumberErrorMsg = buildErrorMsg(
+  "$1 should be a natural number"
+);
 
 export function isStringifiedFloat(value: unknown): boolean {
   return isString(value) && !isNaN(parseFloat(value));
 }
 
+export function isStringifiedInt(value: unknown): boolean {
+  return isString(value) && !isNaN(parseInt(value));
+}
+
 export function isPresent(value: unknown): boolean {
   return value !== undefined && value !== null && value !== "";
+}
+
+export function isFormValid(
+  spectedValidationRes: Record<string, true | string[]>
+): boolean {
+  let isValid = true;
+  for (const key in spectedValidationRes) {
+    if (Array.isArray(spectedValidationRes[key])) {
+      isValid &&= false;
+    }
+
+    if (isRecord(spectedValidationRes[key])) {
+      isValid &&= isFormValid(spectedValidationRes[key] as any);
+    }
+  }
+
+  return isValid;
 }
 
 export const replaceXWithYARecursively =
