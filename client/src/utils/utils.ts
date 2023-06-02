@@ -13,3 +13,24 @@ export function isNumber(value: unknown): value is number {
 export function isBoolean(value: unknown): value is boolean {
   return typeof value === "boolean";
 }
+
+// form validation utils
+
+/**
+ * @param pattern - Error string where the "$1" will be replaced with the field name
+ */
+export const buildErrorMsg =
+  (pattern: `${string}$1${string}`) => (fieldName: string) => {
+    return pattern.replace("$1", fieldName);
+  };
+
+export const isRequiredErrorMsg = buildErrorMsg("$1 is required");
+export const shouldBeNumberErrorMsg = buildErrorMsg("$1 should be a number");
+
+export function isStringifiedFload(value: unknown): boolean {
+  return isString(value) && !isNaN(parseFloat(value));
+}
+
+export function isPresent(value: unknown): boolean {
+  return value !== undefined && value !== null && value !== "";
+}

@@ -28,7 +28,7 @@ export function Input({
     <div className={className}>
       <div>{label}</div>
       <input type={type} value={value} onChange={onChangeHandler}></input>
-      {!!error && <div>{error}</div>}
+      {!!error && <div className="errorMsg">{error}</div>}
     </div>
   );
 }

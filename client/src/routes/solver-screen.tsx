@@ -97,18 +97,21 @@ export const SolverScreen = observer(() => {
             label="Charge time (min):"
             onChange={bloc.setChargeTime}
             value={bloc.formData.chargeTime}
+            error={bloc.errors.chargeTime[0]}
           />
           <Input
             className="withRightMargin"
             label="Max flight time (min):"
             onChange={bloc.setMaxFlightTime}
             value={bloc.formData.maxFlightTime}
+            error={bloc.errors.maxFlightTime[0]}
           />
           <Input
             className="withRightMargin"
             label="Speed (km/h):"
             onChange={bloc.setSpeed}
             value={bloc.formData.speed}
+            error={bloc.errors.speed[0]}
           />
         </div>
 

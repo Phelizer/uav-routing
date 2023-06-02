@@ -9,6 +9,14 @@ import { Point } from "../models";
 import { SolverService } from "../services/solver.service";
 import { solutionsStoreInstance } from "../stores/solutions.store";
 import { saveAs } from "file-saver";
+import * as R from "ramda";
+import spected, { SpecObject } from "spected";
+import {
+  isPresent,
+  isRequiredErrorMsg,
+  isStringifiedFload,
+} from "../utils/utils";
+// import { array, boolean, number, object, string } from "yup";
 
 interface Coords {
   lat: string;
@@ -41,6 +49,36 @@ type StringFieldsOfInputDataForm = {
 type VisualizationType = "googlemaps" | "d3";
 
 export class SolverScreenBLoC {
+  private validationRules: SpecObject<InputDataForm> = {
+    chargeTime: [
+      [isPresent, isRequiredErrorMsg("Charge time")],
+      [isStringifiedFload, "Charge time must be a number"],
+    ],
+    maxFlightTime: [
+      [isPresent, isRequiredErrorMsg("Max flight time")],
+      [isStringifiedFload, "Max flight time must be a number"],
+    ],
+    speed: [
+      [isPresent, isRequiredErrorMsg("Speed")],
+      [isStringifiedFload, "Speed must be a number"],
+    ],
+  };
+
+  private readonly coordsEmptyErrors = {
+    lat: "",
+    lng: "",
+  };
+
+  @observable
+  errors: Record<string, string[]> = {
+    points: [],
+    startBase: [],
+    anotherBase: [],
+    chargeTime: [],
+    maxFlightTime: [],
+    speed: [],
+  };
+
   @observable
   formData: InputDataForm = {
     points: [this.createEmptyPoint()],
@@ -248,7 +286,44 @@ export class SolverScreenBLoC {
   setMaxFlightTime = this.createFormFieldSetter("maxFlightTime");
   setSpeed = this.createFormFieldSetter("speed");
 
+  private isFormValid(spectedValidationRes: Record<string, true | string[]>) {
+    for (const key in spectedValidationRes) {
+      if (spectedValidationRes[key] !== true) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  @action
+  private writeErrors = (
+    spectedValidationRes: Record<string, true | string[]>
+  ) => {
+    for (const key in spectedValidationRes) {
+      const errorsOrTrue = spectedValidationRes[key];
+      if (Array.isArray(errorsOrTrue)) {
+        this.errors[key] = errorsOrTrue;
+      }
+
+      if (errorsOrTrue === true) {
+        this.errors[key] = [];
+      }
+    }
+  };
+
+  private validate(data: InputDataForm) {
+    const res = spected(this.validationRules, data);
+    this.writeErrors(res as any);
+    return this.isFormValid(res as any);
+  }
+
   submitForm = async () => {
+    const valid = this.validate(this.formData);
+    if (!valid) {
+      return;
+    }
+
     const data = this.prepareFormData();
     await this.solverService.calculateRoute(data);
   };
