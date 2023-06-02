@@ -14,6 +14,7 @@ export const LoginScreen = observer(() => {
         label="username"
         value={bloc.formData.username}
         onChange={bloc.setUsername}
+        error={(bloc.errors as any)?.username?.[0]}
       />
 
       <Input
@@ -22,6 +23,7 @@ export const LoginScreen = observer(() => {
         value={bloc.formData.password}
         onChange={bloc.setPassword}
         type="password"
+        error={(bloc.errors as any)?.password?.[0]}
       />
 
       <Button
