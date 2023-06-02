@@ -1,3 +1,5 @@
+import * as R from "ramda";
+
 export function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && !Array.isArray(value) && value !== null;
 }
@@ -34,3 +36,22 @@ export function isStringifiedFloat(value: unknown): boolean {
 export function isPresent(value: unknown): boolean {
   return value !== undefined && value !== null && value !== "";
 }
+
+export const replaceXWithYARecursively =
+  <X, Y>(isX: { (v: unknown): v is X }, y: Y) =>
+  (obj: Record<string, unknown>) => {
+    const clonedObj = R.clone(obj);
+
+    for (const key in clonedObj) {
+      const value = clonedObj[key];
+      if (isX(value)) {
+        clonedObj[key] = y;
+      }
+
+      if (isRecord(value)) {
+        replaceXWithYARecursively(isX, y)(value);
+      }
+    }
+
+    return clonedObj;
+  };

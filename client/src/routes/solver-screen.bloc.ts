@@ -16,6 +16,7 @@ import {
   isRecord,
   isRequiredErrorMsg,
   isStringifiedFloat,
+  replaceXWithYARecursively,
   shouldBeNumberErrorMsg,
 } from "../utils/utils";
 // import { array, boolean, number, object, string } from "yup";
@@ -80,38 +81,15 @@ export class SolverScreenBLoC {
     ],
   };
 
-  private readonly coordsEmptyErrors = {
-    lat: "",
-    lng: "",
-  };
-
   @computed
   get errors() {
-    const errors = this.replaceTrueWithEmptyArrayRecursively(
-      this.lastValidationResult
-    );
+    const errors = replaceXWithYARecursively(
+      (v: unknown): v is true => v === true,
+      []
+    )(this.lastValidationResult);
 
     return errors;
   }
-
-  private replaceTrueWithEmptyArrayRecursively = (
-    obj: Record<string, unknown>
-  ) => {
-    const clonedObj = R.clone(obj);
-
-    for (const key in clonedObj) {
-      const value = clonedObj[key];
-      if (value === true) {
-        clonedObj[key] = [];
-      }
-
-      if (isRecord(value)) {
-        this.replaceTrueWithEmptyArrayRecursively(value);
-      }
-    }
-
-    return clonedObj;
-  };
 
   @observable
   formData: InputDataForm = {
