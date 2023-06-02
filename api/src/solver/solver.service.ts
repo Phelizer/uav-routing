@@ -3,8 +3,6 @@ import {
   AlgorithmName,
   AlgorithmParameters,
   CalculateRouteInputData,
-  KilometersPeHour,
-  Milliseconds,
   PerformExperimentInputData,
   Point,
   Result,
@@ -19,7 +17,6 @@ import { Square, generateProblem } from './generateRandomPoint';
 import { buildGreedyRoute, buildValidRoute } from './initValidSolution';
 import { User } from 'src/users/users.service';
 import { join } from 'path';
-import { randomlyReplaceArrayElements } from 'src/utils';
 import * as R from 'ramda';
 import { DBService } from 'src/db/db.service';
 
@@ -50,7 +47,7 @@ export class SolverService {
     maxIterationsWithoutImprovement: 30,
   };
 
-  private solver: Solver = createBeesAlgorithmSolver(this.STANDARD_BEES_PARAMS);
+  private solver: Solver = createAntColonySolver(this.STANDARD_ANTS_PARAMS);
 
   private solverFactoryMapping = {
     ants: createAntColonySolver,

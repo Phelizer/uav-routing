@@ -6,6 +6,7 @@ export interface Point {
   isBase: boolean;
   isStartBase: boolean;
   label: string;
+  id: number;
 }
 
 export function isPoint(value: unknown): value is Point {

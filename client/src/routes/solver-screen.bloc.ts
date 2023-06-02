@@ -353,6 +353,7 @@ export class SolverScreenBLoC {
       isBase: pointData.isBase,
       isStartBase: pointData.isStartBase,
       label: pointData.label,
+      id: pointData.id,
     };
   };
 
