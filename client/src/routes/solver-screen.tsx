@@ -141,14 +141,16 @@ export const SolverScreen = observer(() => {
         )}
 
         {bloc.stringifiedSubroutes.length > 0 && (
-          <div className="withLeftMargin withTopMargin">RESULT:</div>
-        )}
+          <div className="resultsContainer withLeftMargin withTopMargin withBottomMargin">
+            <div className="withTopMargin ">RESULT:</div>
 
-        {bloc.stringifiedSubroutes.map((subrouteStr) => (
-          <div className="withLeftMargin withTopMargin withBottomMargin">
-            <b>{subrouteStr}</b>
+            {bloc.stringifiedSubroutes.map((subrouteStr) => (
+              <div className="withTopMargin withBottomMargin">
+                <b>{subrouteStr}</b>
+              </div>
+            ))}
           </div>
-        ))}
+        )}
       </div>
 
       <div>

@@ -20,3 +20,12 @@
     height: 30px !important;
     font-size: 12px !important;
 }
+
+.resultsContainer {
+    padding: 20px;
+    border-radius: 6px;
+    border-width: 1px;
+    border-color: black;
+    border-style: solid;
+    width: 35vw;
+}
