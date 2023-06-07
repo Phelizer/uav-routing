@@ -277,6 +277,16 @@ export class SolverScreenBLoC {
     this.formData.points.push(this.createEmptyPoint());
   };
 
+  @computed
+  get shouldRemovePointButtonBeVisible() {
+    return this.formData.points.length > 1;
+  }
+
+  @action
+  createRemovePointHandler = (index: number) => () => {
+    this.formData.points.splice(index, 1);
+  };
+
   private createBaseSetter =
     (type: "startBase" | "anotherBase") => (fieldName: "lat" | "lng") =>
       action((value: string) => {

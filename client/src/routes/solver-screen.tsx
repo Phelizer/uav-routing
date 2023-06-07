@@ -7,6 +7,7 @@ import { GoogleMapsVisualization } from "../components/GoogleMapsVisualization";
 import Switch from "react-switch";
 import { D3Visualization } from "../components/D3Visualization";
 import { Button } from "../components/Button";
+import { CrossButton } from "../components/CrossButton";
 
 export const SolverScreen = observer(() => {
   const bloc = useMemo(() => new SolverScreenBLoC(), []);
@@ -24,10 +25,10 @@ export const SolverScreen = observer(() => {
     <div className="nonCenteredRow">
       <div>
         {bloc.formData.points.map((pointData, i, { length }) => (
-          <Fragment key={i}>
+          <div key={i}>
             <div className="withLeftMargin">{`Point ${i + 1}:`}</div>
             <div
-              className={`row withLeftMargin${
+              className={`relative row withLeftMargin${
                 i !== length - 1 ? " withBottomMargin" : ""
               }`}
             >
@@ -47,9 +48,18 @@ export const SolverScreen = observer(() => {
                 error={(bloc.errors?.points as any)?.[`${i}`]?.lng?.[0]}
               />
 
+              {bloc.shouldRemovePointButtonBeVisible && (
+                <CrossButton
+                  className="solver-screen-cross-button-location"
+                  onClick={bloc.createRemovePointHandler(i)}
+                >
+                  ⨯
+                </CrossButton>
+              )}
+
               <div>Label: {pointData.label}</div>
             </div>
-          </Fragment>
+          </div>
         ))}
         <Button
           className="shrinkCustomButtonAmendments withLeftMargin withBottomMargin withTinyTopMargin"

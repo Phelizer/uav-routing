@@ -10,9 +10,6 @@
     align-items: center;
     justify-content: center;
     background-color: lavender;
-    /* margin-left: 5vw;
-    margin-right: 5vw;
-    margin-bottom: 5vw; */
 }
 
 .shrinkCustomButtonAmendments {
@@ -28,4 +25,10 @@
     border-color: black;
     border-style: solid;
     width: 35vw;
+}
+
+.solver-screen-cross-button-location {
+    position: absolute;
+    left: 25vw;
+    bottom: 2vh;
 }

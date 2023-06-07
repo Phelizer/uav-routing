@@ -1,0 +1,11 @@
+.red-cross-button {
+    background-color: transparent;
+    color: red;
+    border: none;
+    font-size: 20px;
+    padding: 10px;
+    cursor: pointer;
+}
+.red-cross-button:hover {
+    color: darkred;
+}
