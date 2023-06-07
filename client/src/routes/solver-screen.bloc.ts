@@ -443,6 +443,23 @@ export class SolverScreenBLoC {
     return this.subroutes.map(this.stringifySubroute);
   }
 
+  // in meters
+  @computed
+  get routeDistance() {
+    const meters = (solutionsStoreInstance.lastSolution?.distance ?? 0) * 1000;
+    return meters.toFixed();
+  }
+
+  // in minutes
+  @computed
+  get routeTime() {
+    const minutes =
+      (solutionsStoreInstance.lastSolution?.fitness ?? 0) /
+      this.MIN_TO_MILLISEC;
+
+    return minutes.toFixed();
+  }
+
   readonly offset = 0.05;
 
   @computed

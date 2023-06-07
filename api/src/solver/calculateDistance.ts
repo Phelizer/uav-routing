@@ -31,3 +31,17 @@ export function calculateDistance(point1: Coords, point2: Coords): Kilometers {
 function degreeToRadians(degree: Degrees) {
   return degree * (Math.PI / 180);
 }
+
+export function calculateRouteDistance(route: Coords[]) {
+  let totalDistance = 0;
+  let i = 0;
+  for (; i < route.length - 1; i++) {
+    const point1 = route[i];
+    const point2 = route[i + 1];
+    totalDistance += calculateDistance(point1, point2);
+  }
+
+  console.log({ routeLen: route.length, i });
+
+  return totalDistance;
+}

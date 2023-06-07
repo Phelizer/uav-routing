@@ -19,6 +19,7 @@ import { User } from 'src/users/users.service';
 import { join } from 'path';
 import * as R from 'ramda';
 import { DBService } from 'src/db/db.service';
+import { calculateRouteDistance } from './calculateDistance';
 
 interface ExperimentResultForDownload extends PerformExperimentInputData {
   mean: number;
@@ -58,7 +59,7 @@ export class SolverService {
   async calculateRoute(
     inputData: CalculateRouteInputData,
     user: User,
-  ): Promise<Result & Record<string, unknown>> {
+  ): Promise<Result & { distance: number }> {
     const {
       pointsToObserve,
       startBase,
@@ -103,7 +104,9 @@ export class SolverService {
 
     await this.saveSolutionToDB(user.id, solution);
 
-    return solution;
+    const distance = calculateRouteDistance(solution.route);
+
+    return { ...solution, distance };
   }
 
   private async saveSolutionToDB(userID: number, solution: Solution) {

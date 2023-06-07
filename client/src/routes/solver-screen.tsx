@@ -142,7 +142,9 @@ export const SolverScreen = observer(() => {
 
         {bloc.stringifiedSubroutes.length > 0 && (
           <div className="resultsContainer withLeftMargin withTopMargin withBottomMargin">
-            <div className="withTopMargin ">RESULT:</div>
+            <div className="withTopMargin ">{`ROUTE DISTANCE: ${bloc.routeDistance} m`}</div>
+            <div className="withTopMargin ">{`ROUTE TIME: ${bloc.routeTime} min`}</div>
+            <div className="withTopMargin ">ROUTE:</div>
 
             {bloc.stringifiedSubroutes.map((subrouteStr) => (
               <div className="withTopMargin withBottomMargin">

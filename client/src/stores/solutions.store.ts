@@ -3,7 +3,7 @@ import { Solution } from "../models";
 
 class SolutionsStore {
   @observable
-  lastSolution: Solution | null = null;
+  lastSolution: (Solution & { distance: number }) | null = null;
 
   @observable
   lastExperimentSolutions: Solution[] = [];

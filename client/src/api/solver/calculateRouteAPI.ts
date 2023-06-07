@@ -1,4 +1,5 @@
-import { Point, isSolution } from "../../models";
+import { Point, Solution, isSolution } from "../../models";
+import { isNumber } from "../../utils/utils";
 import { API_BASE_URL } from "../consts";
 import { fetchAPI } from "../fetchAPI";
 import { getStandardHeaders } from "../getStandardHeaders";
@@ -20,5 +21,10 @@ export async function calculateRouteAPI(body: CalculateRouteData) {
     headers: getStandardHeaders(),
   };
 
-  return await fetchAPI(url, isSolution, options);
+  const typeguard = (
+    value: unknown
+  ): value is Solution & { distance: number } =>
+    isSolution(value) && "distance" in value && isNumber(value.distance);
+
+  return await fetchAPI(url, typeguard, options);
 }

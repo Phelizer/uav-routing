@@ -1,12 +1,4 @@
-import {
-  Body,
-  Controller,
-  Get,
-  NotFoundException,
-  Post,
-  Req,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
 import { CalculateRouteInputData, PerformExperimentInputData } from './models';
 import { NoLastEntityYetError, SolverService } from './solver.service';
 import { Roles } from 'src/users/roles.decorator';
