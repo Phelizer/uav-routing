@@ -16,6 +16,9 @@ export class NavBarBLoC {
 
   logOutHandler = this.authService.logout;
 
+  readonly experimentRoute = "/experiment";
+  readonly solverRoute = "/";
+
   @computed
   get shouldExperimentBeAvailable() {
     return appStateStoreInstance.roles.includes("researcher");
