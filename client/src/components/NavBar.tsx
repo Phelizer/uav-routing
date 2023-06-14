@@ -24,9 +24,11 @@ export const NavBar = observer(() => {
         <Button className="nav-button" onClick={goToSolver}>
           Solver
         </Button>
-        <Button className="nav-button" onClick={goToExperiment}>
-          Perform Experiments
-        </Button>
+        {bloc.shouldExperimentBeAvailable && (
+          <Button className="nav-button" onClick={goToExperiment}>
+            Perform Experiments
+          </Button>
+        )}
       </div>
 
       <Button className="nav-button" onClick={bloc.logOutHandler}>
