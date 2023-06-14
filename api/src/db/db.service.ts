@@ -13,7 +13,7 @@ export class DBService implements OnModuleInit {
       host: 'localhost',
       database: 'uav-routing-postgres',
       password: '1111',
-      port: 5432,
+      port: 5433,
     });
     try {
       await this.pool.connect();
